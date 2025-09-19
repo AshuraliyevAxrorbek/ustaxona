@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teleshop - Telefon bozor</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter font -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #E9F0F4;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Kontent yuqoriroqdan boshlansin */
+            min-height: 100vh;
+            padding: 1.5rem 1rem;
+        }
+        .main-container {
+            background-color: #E9F0F4;
+            border-radius: 1rem;
+            padding: 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            animation: fadeIn 0.8s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .main-button {
+            background-color: #0088CC; /* Telegram ko'k rangi */
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .main-button:hover {
+            background-color: #007AB8;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+        .problem-block {
+            background-color: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .problem-block:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        }
+        .solution-box {
+            background-color: #E3F2FD;
+            border-left: 5px solid #2196F3;
+            padding: 1.5rem;
+            animation: slideDown 0.4s ease-out;
+            margin-top: 1rem;
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .faq-chevron {
+            transition: transform 0.3s ease;
+        }
+        .faq-chevron.rotate {
+            transform: rotate(180deg);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-container">
+        <!-- Header: O'rtada logotip va matn -->
+        <header class="flex flex-col items-center text-center pb-4 border-b-2 border-gray-200">
+            <h1 class="text-3xl md:text-4xl font-extrabold text-gray-800 tracking-wide">Teleshop</h1>
+            <h2 class="text-lg md:text-xl font-bold text-gray-500 mt-1">Telefonigizda qanday muammo bo'lsa ushbu qidiruv orqali biroz bo'lsada javob topishingiz mumkin bo'ladi.</h2>
+        </header>
+
+        <!-- Main content: Search and Problems -->
+        <main class="flex flex-col gap-4">
+            <div class="relative">
+                <input id="problem-input" type="text" placeholder="Muammoni qidirish..." class="w-full px-5 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 transition-colors duration-200 text-gray-700 placeholder-gray-400" />
+            </div>
+            <button id="search-button" class="w-full py-3 text-lg font-bold text-white rounded-lg main-button">Yechimni topish</button>
+        </main>
+
+        <!-- Problems list -->
+        <section id="problems-list" class="flex flex-col gap-3 mt-4"></section>
+    </div>
+
+    <script>
+        const problemInput = document.getElementById('problem-input');
+        const searchButton = document.getElementById('search-button');
+        const problemsList = document.getElementById('problems-list');
+
+        // All problems and solutions
+        const allProblems = [
+            { problem: "Batareya tez tugab qolmoqda", solution: "Bu muammoning bir nechta sababi bo'lishi mumkin. **Keraksiz fon ilovalarini yoping**, ekran yorug'ligini kamaytiring va 'quvvatni tejash' rejimini yoqing. Agar batareya eski bo'lsa, uni almashtirish kerak bo'lishi mumkin." },
+            { problem: "Telefon qizib ketmoqda", solution: "Telefon qizishi og'ir o'yinlar yoki uzoq vaqt video ko'rishdan bo'lishi mumkin. **Zaryad olayotganda telefondan foydalanmang**. Telefonni salqin joyda saqlang." },
+            { problem: "Ekran yorilib ketdi", solution: "Kichik yoriqlar uchun himoya plyonka yordam berishi mumkin. Agar yoriqlar katta bo'lsa yoki sensor ishlamasa, **ekranni almashtirish zarur**." },
+            { problem: "Quloqchin porti ishlamayapti", solution: "Port ichidagi changni yumshoq cho'tka bilan tozalang. **Boshqa quloqchin bilan sinab ko'ring**. Agar bu yordam bermasa, port yoki audio chip shikastlangan bo'lishi mumkin." },
+            { problem: "Telefon sekin ishlamoqda", solution: "Keraksiz fayllarni, ilovalarni o'chiring va keshni tozalang. **Telefonni muntazam ravishda qayta ishga tushirib turing**." },
+            { problem: "Mikrofon ishlamayapti", solution: "Mikrofon teshiklarini tozalang. Boshqa ilovalar bilan sinab ko'ring. Agar bu yordam bermasa, mikrofon buzilgan bo'lishi mumkin." },
+            { problem: "Kamera ishlamayapti", solution: "Telefonni qayta ishga tushiring. Kamera ilovasining keshini tozalang. Agar muammo davom etsa, **kamera moduli shikastlangan bo'lishi mumkin**." },
+            { problem: "Zaryad olmayapti", solution: "Zaryadlash kabeli va blokini tekshiring. Zaryadlash portini tozalang. **Boshqa zaryadlovchi bilan sinab ko'ring**." },
+            { problem: "Ovoz chiqmayapti", solution: "Ovoz balandligini oshiring. Dinamik teshiklarini tozalang. Agar muammo saqlanib qolsa, **dinamik buzilgan bo'lishi mumkin**." },
+            { problem: "Wi-Fi ulanmayapti", solution: "Telefon va routeringizni qayta ishga tushiring. Wi-Fi tarmog'ini unuting va qayta ulanishni urinib ko'ring." },
+            { problem: "Mobil internet ishlamayapti", solution: "Mobil ma'lumotlar yoqilganligini tekshiring. SIM kartani qayta joylashtiring. **APN sozlamalarini tekshiring**." },
+            { problem: "Telefon tasodifan o'chib qolmoqda", solution: "Batareya holatini tekshiring. So'nggi o'rnatilgan ilovalarni o'chiring. Dasturiy ta'minotni yangilang." },
+            { problem: "Bluetooth ulanmayapti", solution: "Bluetooth'ni o'chirib, qayta yoqing. Qurilmalarni 'unpair' qilib, qayta ulang." },
+            { problem: "SD-karta o'qimayapti", solution: "SD-kartani tozalang va qayta joylashtiring. Boshqa qurilmada sinab ko'ring. Agar ishlamasa, karta buzilgan bo'lishi mumkin." },
+            { problem: "Ekran qotib qoldi", solution: "Telefonni **majburiy qayta ishga tushirish (Force Restart)** tugmalar kombinatsiyasidan foydalaning." },
+            { problem: "Zaryadlash porti bo'shashgan", solution: "Bu jismoniy shikastlanish bo'lishi mumkin. Portni almashtirish zarur." },
+            { problem: "Telefon doimiy qayta ishga tushmoqda", solution: "**Telefonni 'xavfsiz rejimda' (safe mode) ishga tushirib**, muammoli ilovalarni aniqlang." },
+            { problem: "Telefon xotirasi to'lib ketgan", solution: "Keraksiz rasm, video va ilovalarni o'chiring. Bulutli xotiradan yoki SD-kartadan foydalaning." },
+            { problem: "Eshitish dinamiki ishlamayapti", solution: "Telefonni jim rejimdan chiqaring. Dinamik teshigini tozalang." },
+            { problem: "Telefon suvga tushib ketdi", solution: "Darhol **telefonni o'chiring** va uni guruchga qo'ying yoki professionalga murojaat qiling." },
+            { problem: "Telefon parolini unutdim", solution: "Bu holatda, telefonni to'liq o'chirish (Factory Reset) lozim. Lekin bu barcha ma'lumotlaringizni o'chirib yuboradi." },
+            { problem: "Ekran sensorlari ishlamayapti", solution: "Sensor sirtini tozalang. Ekran himoya plyonkasini olib tashlab sinab ko'ring. Agar muammo davom etsa, **displeyni almashtirish zarur**." },
+            { problem: "Ekran miltillamoqda", solution: "Ekran yorug'ligini avtomatik sozlash rejimini o'chirib ko'ring. Agar bu yordam bermasa, displeyda muammo bor." },
+            { problem: "Telefon chaqiruvlari uzilib qolmoqda", solution: "Tarmoq signalini tekshiring. SIM kartani qayta joylashtiring." },
+            { problem: "GPS aniqlamayapti", solution: "Joylashuvni aniqlash (Location) funksiyasi yoqilganligini tekshiring. Telefonni qayta ishga tushiring." },
+            { problem: "Qo'ng'iroq paytida ovozim eshitilmayapti", solution: "Qo'ng'iroq paytida mikrofon yopilmaganligini tekshiring. Mikrofon teshiklarini tozalang." },
+            { problem: "Telefon avtomatik ravishda ilovalarni yopmoqda", solution: "Bu RAM xotirasining yetishmasligi bilan bog'liq bo'lishi mumkin. Keraksiz fon ilovalarini yoping." },
+            { problem: "Klaviatura ko'rinmayapti", solution: "Sozlamalardan klaviatura ilovasining ma'lumotlarini o'chiring. Boshqa klaviaturani yuklab olib sinab ko'ring." },
+            { problem: "SIM karta tanilmayapti", solution: "SIM kartani tozalang va qayta joylashtiring. Boshqa SIM karta bilan sinab ko'ring." },
+            { problem: "Telefon quvvatdan o'chmayapti", solution: "Quvvat tugmasini uzoq bosib turing. Agar o'chmasa, batareyani chiqarib oling yoki ustaga murojaat qiling." },
+            { problem: "Telefoningizga kirish qiyin bo'lmoqda", solution: "Ekran himoyachisini tozalang. Agar muammo hali ham mavjud bo'lsa, sensorlar yuzasidagi kir bo'lishi mumkin." },
+            { problem: "Telefon tez-tez muzlab qolmoqda", solution: "Operativ xotirani tozalang. Fon ilovalarini yoping. Telefoningizning dasturiy ta'minotini yangilang." },
+            { problem: "Telefon yonmayapti", solution: "Zaryadga qo'ying va 15-20 daqiqa kuting. Agar yonmasa, zaryadlovchi kabelni va blokni almashtirib ko'ring." },
+            { problem: "Telefonim ovoz yozmayapti", solution: "Mikrofon teshiklarini tozalang. Ilova ruxsatlarini tekshiring. Boshqa ilovada yozib ko'ring." },
+            { problem: "Telefonimda virus bor", solution: "Antivirus ilovasini o'rnating va to'liq skanerlashni amalga oshiring. Shubhali ilovalarni o'chiring." },
+            { problem: "Ekran ranglari buzilgan", solution: "Ekran sozlamalarini tekshiring. Rang rejimini o'zgartiring. Agar muammo davom etsa, **displeyning o'zi buzilgan** bo'lishi mumkin." },
+            { problem: "Telefon signal ushlamayapti", solution: "SIM kartaning to'g'ri joylashganligini tekshiring. Tarmoq sozlamalarini 'avtomatik' holatiga o'tkazing." },
+            { problem: "Telefon ovozli qo'ng'iroqlarni amalga oshira olmayapti", solution: "SIM kartani almashtirib ko'ring. Tarmoq sozlamalarini 'avtomatik' holatiga o'tkazing." },
+            { problem: "Telefon sensorlari ishlamayapti", solution: "Telefonni qayta ishga tushiring. Telefonni 'Factory Reset' qilib ko'ring." },
+            { problem: "Telefon ekranida qora joy paydo bo'ldi", solution: "Bu displeyning jiddiy shikastlanishi bilan bog'liq. Displey almashtirilishi zarur." },
+            { problem: "Telefonimni kompyuter tanimayapti", solution: "USB kabelini almashtirib ko'ring. Kompyuterda draiverlarni tekshiring. Telefonning USB sozlamalarini 'Fayl uzatish' rejimiga o'tkazing." },
+            { problem: "Telefonning vibratsiyasi ishlamayapti", solution: "Vibratsiya sozlamalarini tekshiring. Agar ular yoqiq bo'lsa, **vibratsiya motorida muammo bor**." },
+            { problem: "Telefon orqa qopqog'i ko'chib ketdi", solution: "Bu batareyaning shishganligidan dalolat berishi mumkin. **Darhol professionalga murojaat qiling**, chunki bu xavfli bo'lishi mumkin." },
+            { problem: "Telefon keshini tozalash kerakmi?", solution: "Ha, muntazam ravishda ilovalar keshini tozalash telefonning tez ishlashiga yordam beradi." },
+            { problem: "Face ID / Barmoq izi ishlamayapti", solution: "Sensor sirtini tozalang. Barmoq izini yoki yuzni qayta kiritib ko'ring. Agar bu yordam bermasa, **sensorning o'zi buzilgan** bo'lishi mumkin." },
+            { problem: "Ekran ustida dog'lar paydo bo'ldi", solution: "Bu displeyning suyuqlik bilan aloqasi yoki ichki shikastlanishi natijasida yuzaga keladi. **Displey almashtirilishi zarur**." },
+            { problem: "Telefonim zaryad olayotgan paytda shovqin qilmoqda", solution: "Bu odatda zaryadlovchi adapter yoki kabel bilan bog'liq. Ularni boshqa, sifatliroq zaryadlovchiga almashtirib ko'ring." },
+            { problem: "Telefon ekrani o'chib-yonmoqda", solution: "Bu displey kabelining bo'shashganligi yoki shikastlanganligi bilan bog'liq. **Displeyni ta'mirlash kerak** bo'lishi mumkin." },
+            { problem: "Telefoningizga kirish qiyin bo'lmoqda", solution: "Ekran himoyachisini tozalang. Agar muammo hali ham mavjud bo'lsa, sensorlar yuzasidagi kir bo'lishi mumkin." },
+            { problem: "Telefonning ovozi pasayib ketdi", solution: "Dinamik teshiklarini tozalang. Agar ovoz hali ham past bo'lsa, **dinamikni almashtirish zarur** bo'lishi mumkin." },
+        ];
+
+        // Function to render problems
+        function renderProblems(problems) {
+            problemsList.innerHTML = '';
+            if (problems.length === 0) {
+                problemsList.innerHTML = '<p class="text-center text-gray-500 text-base mt-4">Afususki, siz so\'ragan muammo topilmadi.</p>';
+                return;
+            }
+            problems.forEach((item, index) => {
+                const problemContainer = document.createElement('div');
+                problemContainer.className = 'problem-container';
+                
+                const problemBlock = document.createElement('div');
+                problemBlock.className = 'problem-block p-4 rounded-lg shadow-sm text-gray-800 font-medium text-base cursor-pointer flex justify-between items-center';
+                problemBlock.innerHTML = `
+                    <span class="font-semibold">${item.problem}</span>
+                    <i class="fas fa-chevron-down faq-chevron text-blue-500 text-lg ml-4"></i>
+                `;
+                problemBlock.dataset.index = index;
+                
+                const solutionBox = document.createElement('div');
+                solutionBox.className = 'solution-box rounded-lg hidden';
+                solutionBox.innerHTML = `
+                    <h3 class="text-lg font-bold text-gray-800 mb-2">Yechim:</h3>
+                    <p class="text-gray-700 leading-relaxed text-sm">${item.solution}</p>
+                `;
+                
+                problemContainer.appendChild(problemBlock);
+                problemContainer.appendChild(solutionBox);
+                problemsList.appendChild(problemContainer);
+            });
+        }
+
+        // Search function
+        function searchProblems() {
+            const query = problemInput.value.toLowerCase().trim();
+            const filteredProblems = allProblems.filter(item => 
+                item.problem.toLowerCase().includes(query)
+            );
+            renderProblems(filteredProblems);
+        }
+        
+        // Initial render on page load
+        window.onload = function() {
+            renderProblems(allProblems);
+            searchButton.addEventListener('click', searchProblems);
+            problemInput.addEventListener('input', searchProblems);
+        };
+
+        // Click event listener for FAQ-style accordion
+        problemsList.addEventListener('click', (e) => {
+            const problemBlock = e.target.closest('.problem-block');
+            if (problemBlock) {
+                const solutionBox = problemBlock.nextElementSibling;
+                const chevronIcon = problemBlock.querySelector('.faq-chevron');
+
+                // Close other open solutions
+                document.querySelectorAll('.solution-box').forEach(box => {
+                    if (box !== solutionBox && !box.classList.contains('hidden')) {
+                        box.classList.add('hidden');
+                        box.previousElementSibling.querySelector('.faq-chevron').classList.remove('rotate');
+                    }
+                });
+
+                // Toggle current solution and icon rotation
+                solutionBox.classList.toggle('hidden');
+                chevronIcon.classList.toggle('rotate');
+            }
+        });
+    </script>
+</body>
+</html>
