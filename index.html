@@ -1,225 +1,523 @@
 <!DOCTYPE html>
 <html lang="uz">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teleshop - Telefon bozor</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Inter font -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #E9F0F4;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start; /* Kontent yuqoriroqdan boshlansin */
-            min-height: 100vh;
-            padding: 1.5rem 1rem;
-        }
-        .main-container {
-            background-color: #E9F0F4;
-            border-radius: 1rem;
-            padding: 2rem 1.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-            animation: fadeIn 0.8s ease-in-out;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .main-button {
-            background-color: #0088CC; /* Telegram ko'k rangi */
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
-        .main-button:hover {
-            background-color: #007AB8;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
-        }
-        .problem-block {
-            background-color: #FFFFFF;
-            border: 1px solid #E5E7EB;
-            cursor: pointer;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        .problem-block:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-        }
-        .solution-box {
-            background-color: #E3F2FD;
-            border-left: 5px solid #2196F3;
-            padding: 1.5rem;
-            animation: slideDown 0.4s ease-out;
-            margin-top: 1rem;
-        }
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .faq-chevron {
-            transition: transform 0.3s ease;
-        }
-        .faq-chevron.rotate {
-            transform: rotate(180deg);
-        }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Telefon Ustaxona — WebApp (Liquid Glass, Pro)</title>
+  <meta name="theme-color" content="#0f172a">
+  <style>
+    /* ————— Reset & base ————— */
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji"; }
+
+    /* ————— Theme (improved day/night contrast) ————— */
+    :root{
+      /* Night mode – deep, elegant, OLED-friendly */
+      --bg: #05070d;
+      --text: #e9eef7;
+      --muted: #9ba8b9;
+      --primary: #3b82f6;
+      --accent: #14b8a6;
+      --accent-2: #2dd4bf;
+      --warning: #f59e0b;
+      --danger: #f43f5e;
+      --glass: rgba(10,15,24,0.82);
+      --glass-2: rgba(10,15,24,0.6);
+      --ring: rgba(59,130,246,0.35);
+      --border: rgba(148,163,184,0.14);
+      --chip: rgba(148,163,184,0.16);
+      --chip-text: #e9eef7;
+    }
+/* ————— Theme (serious / pro palette, dark & light) ————— */
+
+    /* DARK (default) */
+    :root{
+    --bg: #0c1220;            /* deep navy */
+    --text: #e6edf3;          /* soft white */
+    --muted: #9aa8ba;         /* slate */
+    --primary: #1f6feb;       /* pro blue */
+    --accent: #2dd4bf;        /* teal */
+    --accent-2: #14b8a6;      /* stronger teal */
+    --warning: #f59e0b;       /* amber for notices */
+    --danger: #f43f5e;        /* rose */
+    --glass: rgba(20,26,38,0.78);
+    --glass-2: rgba(18,24,38,0.62);
+    --ring: rgba(31,111,235,0.35);
+    --border: rgba(148,163,184,0.16);
+    --chip: rgba(148,163,184,0.15);
+    --chip-text: #dbe2ea;
+    }
+
+    /* LIGHT (day mode) */
+    .light{
+    --bg: #f5f7fb;            /* bright soft white */
+    --text: #0f172a;
+    --muted: #475569;
+    --primary: #2563eb;
+    --accent: #0ea5a3;
+    --accent-2: #14b8a6;
+    --warning: #b45309;
+    --danger: #b91c1c;
+    --glass: rgba(255,255,255,0.78);
+    --glass-2: rgba(255,255,255,0.6);
+    --ring: rgba(37,99,235,0.2);
+    --border: rgba(15,23,42,0.12);
+    --chip: #e2e8f0;
+    --chip-text: #1e293b;
+    }
+
+    .light{
+      /* Light professional */
+      --bg: #f5f7fb;
+      --text: #0f172a;
+      --muted: #475569;
+      --primary: #2563eb;
+      --accent: #0ea5a3;
+      --accent-2: #14b8a6;
+      --warning: #b45309;
+      --danger: #b91c1c;
+      --glass: rgba(255,255,255,0.78);
+      --glass-2: rgba(255,255,255,0.6);
+      --ring: rgba(37,99,235,0.2);
+      --border: rgba(15,23,42,0.12);
+      --chip: #e2e8f0;
+      --chip-text: #1e293b;
+    }
+
+    /* ————— Liquid glass background (serious) ————— */
+/* --- Background wrapper (night default) --- */
+    .bg-wrap{
+    position: fixed; inset:0; overflow:hidden; z-index:-1;
+    background:
+        radial-gradient(60rem 60rem at 120% -10%, rgba(31,111,235,0.14), transparent 60%),
+        radial-gradient(40rem 40rem at -20% 10%, rgba(20,184,166,0.12), transparent 60%),
+        linear-gradient(180deg, #05070d, #0c1220 40%, #05070d 100%);
+    transition: background 0.6s ease, opacity 0.6s ease;
+    }
+
+    /* --- DAY MODE background with fade --- */
+    .light .bg-wrap{
+    background:
+        radial-gradient(55rem 55rem at 110% -8%, rgba(59,130,246,0.22), transparent 60%),
+        radial-gradient(42rem 42rem at -18% 12%, rgba(20,184,166,0.20), transparent 60%),
+        linear-gradient(180deg, #f8fafc, #e8edf6 50%, #f8fafc 100%);
+    transition: background 0.6s ease, opacity 0.6s ease;
+    }
+
+    .blob{ position:absolute; filter: blur(28px) saturate(130%); opacity:.5; mix-blend: screen; }
+    .blob.b1{ width: 38rem; height: 38rem; left:-12rem; top:-10rem; background: radial-gradient(circle at 30% 30%, rgba(31,111,235,0.32), transparent 60%); }
+    .blob.b2{ width: 34rem; height: 34rem; right:-10rem; top:-6rem; background: radial-gradient(circle at 70% 30%, rgba(20,184,166,0.30), transparent 60%); }
+    .blob.b3{ width: 44rem; height: 44rem; left:50%; bottom:-16rem; transform:translateX(-50%); background: radial-gradient(circle at 50% 50%, rgba(14,165,233,0.18), transparent 60%); }
+
+    /* ————— Layout ————— */
+    .container{ max-width: 460px; margin: 0 auto; padding: 14px; padding-bottom: 112px; min-height: 100dvh; }
+    .topbar{ position: sticky; top: 0; backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); background: color-mix(in srgb, var(--glass) 92%, transparent); border-bottom: 1px solid var(--border); z-index: 20; }
+    .topbar-inner{ max-width: 460px; margin: 0 auto; display:flex; align-items:center; justify-content:space-between; gap:10px; padding: 10px 12px; color: var(--text); }
+
+    /* ————— Glass cards ————— */
+    .glass{ background: linear-gradient(180deg, var(--glass), var(--glass-2)); border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(2,6,23,0.28); border-radius: 18px; padding: 14px; backdrop-filter: blur(16px) saturate(140%); -webkit-backdrop-filter: blur(16px) saturate(140%); }
+    .glass + .glass{ margin-top: 12px; }
+
+    h1,h2,h3{ color: var(--text); margin: 0 0 6px; }
+    p{ color: var(--muted); margin: 0 0 10px; }
+
+    /* ————— Controls ————— */
+    .btn{ display:inline-flex; align-items:center; justify-content:center; gap:8px; border:1px solid var(--border); background:#fff0; color: var(--text); padding: 10px 14px; border-radius: 14px; cursor:pointer; transition: transform .06s ease, background .2s ease, border-color .2s ease; text-decoration:none; }
+    .btn:active{ transform: translateY(1px) }
+    .btn.primary{ background: linear-gradient(135deg, var(--primary), var(--accent)); color: white; border-color: transparent; }
+    .btn.ghost{ background: transparent; }
+    .btn.block{ width: 100%; }
+
+    .row{ display:grid; grid-template-columns: 1fr; gap: 10px; }
+
+    .input, .select, textarea{ width:100%; padding: 12px 12px; border-radius: 14px; background: color-mix(in srgb, var(--glass-2) 70%, transparent); color: var(--text); border:1px solid var(--border); outline: none; box-shadow: 0 0 0 0 var(--ring); transition: box-shadow .2s ease, border-color .2s ease, background .2s ease; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+    .input:focus, .select:focus, textarea:focus{ border-color: transparent; box-shadow: 0 0 0 6px var(--ring); }
+    label{ font-size: 12px; color: var(--muted); margin-bottom: 4px; display:block; }
+
+    .chips{ display:flex; flex-wrap: wrap; gap: 8px; }
+    .chip{ padding: 6px 10px; border-radius: 999px; background: var(--chip); color: var(--chip-text); cursor:pointer; border:1px solid var(--border); font-size:12px; }
+
+    .grid-3{ display:grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+    .grid-2{ display:grid; grid-template-columns: repeat(2,1fr); gap: 8px; }
+
+    /* ————— Footer nav ————— */
+    .footer{ position: fixed; left:0; right:0; bottom: 12px; }
+    .footer-inner{ margin: 0 auto; max-width: 460px; padding: 6px; }
+    .nav{ display:grid; grid-template-columns: repeat(5,1fr); gap:6px; background: linear-gradient(180deg, var(--glass), var(--glass-2)); border:1px solid var(--border); border-radius: 20px; padding: 6px; box-shadow: 0 10px 30px rgba(0,0,0,0.28); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+    .nav button, .nav a{ border-radius: 14px; padding: 8px 4px; font-size: 11px; display:flex; flex-direction:column; align-items:center; }
+    .nav .active{ background: linear-gradient(135deg, var(--primary), var(--accent)); color: #fff; border-color: transparent; }
+
+    /* ————— Helpers ————— */
+    .hidden{ display:none !important; }
+    .muted{ color: var(--muted); }
+    .badge{ background: color-mix(in srgb, var(--glass) 70%, transparent); color: var(--text); border:1px solid var(--border); padding: 6px 10px; border-radius: 999px; font-size: 12px; }
+  </style>
 </head>
 <body>
+  <div class="bg-wrap">
+    <div class="blob b1"></div>
+    <div class="blob b2"></div>
+    <div class="blob b3"></div>
+  </div>
 
-    <div class="main-container">
-        <!-- Header: O'rtada logotip va matn -->
-        <header class="flex flex-col items-center text-center pb-4 border-b-2 border-gray-200">
-            <h1 class="text-3xl md:text-4xl font-extrabold text-gray-800 tracking-wide">Teleshop</h1>
-            <h2 class="text-lg md:text-xl font-bold text-gray-500 mt-1">Telefonigizda qanday muammo bo'lsa ushbu qidiruv orqali biroz bo'lsada javob topishingiz mumkin bo'ladi.</h2>
-        </header>
-
-        <!-- Main content: Search and Problems -->
-        <main class="flex flex-col gap-4">
-            <div class="relative">
-                <input id="problem-input" type="text" placeholder="Muammoni qidirish..." class="w-full px-5 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 transition-colors duration-200 text-gray-700 placeholder-gray-400" />
-            </div>
-            <button id="search-button" class="w-full py-3 text-lg font-bold text-white rounded-lg main-button">Yechimni topish</button>
-        </main>
-
-        <!-- Problems list -->
-        <section id="problems-list" class="flex flex-col gap-3 mt-4"></section>
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="padding:8px;border-radius:12px;background:linear-gradient(135deg,var(--primary),var(--accent)); color:#fff;">🛠️</div>
+        <div>
+          <div style="font-weight:700;line-height:1">Telefon Ustaxona</div>
+          <div class="muted" style="font-size:11px;line-height:1">Liquid glass • Pro UI • AI</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <a class="btn ghost" href="https://t.me/teleshopuz" target="_blank" rel="noopener">📣 Teleshop</a>
+        <button id="themeBtn" class="btn ghost" title="Tun/Tong">🌗</button>
+        <button id="pingBtn" class="btn ghost" title="Ping">📨</button>
+      </div>
     </div>
+  </div>
 
-    <script>
-        const problemInput = document.getElementById('problem-input');
-        const searchButton = document.getElementById('search-button');
-        const problemsList = document.getElementById('problems-list');
+  <!-- Main container -->
+  <div class="container">
 
-        // All problems and solutions
-        const allProblems = [
-            { problem: "Batareya tez tugab qolmoqda", solution: "Bu muammoning bir nechta sababi bo'lishi mumkin. **Keraksiz fon ilovalarini yoping**, ekran yorug'ligini kamaytiring va 'quvvatni tejash' rejimini yoqing. Agar batareya eski bo'lsa, uni almashtirish kerak bo'lishi mumkin." },
-            { problem: "Telefon qizib ketmoqda", solution: "Telefon qizishi og'ir o'yinlar yoki uzoq vaqt video ko'rishdan bo'lishi mumkin. **Zaryad olayotganda telefondan foydalanmang**. Telefonni salqin joyda saqlang." },
-            { problem: "Ekran yorilib ketdi", solution: "Kichik yoriqlar uchun himoya plyonka yordam berishi mumkin. Agar yoriqlar katta bo'lsa yoki sensor ishlamasa, **ekranni almashtirish zarur**." },
-            { problem: "Quloqchin porti ishlamayapti", solution: "Port ichidagi changni yumshoq cho'tka bilan tozalang. **Boshqa quloqchin bilan sinab ko'ring**. Agar bu yordam bermasa, port yoki audio chip shikastlangan bo'lishi mumkin." },
-            { problem: "Telefon sekin ishlamoqda", solution: "Keraksiz fayllarni, ilovalarni o'chiring va keshni tozalang. **Telefonni muntazam ravishda qayta ishga tushirib turing**." },
-            { problem: "Mikrofon ishlamayapti", solution: "Mikrofon teshiklarini tozalang. Boshqa ilovalar bilan sinab ko'ring. Agar bu yordam bermasa, mikrofon buzilgan bo'lishi mumkin." },
-            { problem: "Kamera ishlamayapti", solution: "Telefonni qayta ishga tushiring. Kamera ilovasining keshini tozalang. Agar muammo davom etsa, **kamera moduli shikastlangan bo'lishi mumkin**." },
-            { problem: "Zaryad olmayapti", solution: "Zaryadlash kabeli va blokini tekshiring. Zaryadlash portini tozalang. **Boshqa zaryadlovchi bilan sinab ko'ring**." },
-            { problem: "Ovoz chiqmayapti", solution: "Ovoz balandligini oshiring. Dinamik teshiklarini tozalang. Agar muammo saqlanib qolsa, **dinamik buzilgan bo'lishi mumkin**." },
-            { problem: "Wi-Fi ulanmayapti", solution: "Telefon va routeringizni qayta ishga tushiring. Wi-Fi tarmog'ini unuting va qayta ulanishni urinib ko'ring." },
-            { problem: "Mobil internet ishlamayapti", solution: "Mobil ma'lumotlar yoqilganligini tekshiring. SIM kartani qayta joylashtiring. **APN sozlamalarini tekshiring**." },
-            { problem: "Telefon tasodifan o'chib qolmoqda", solution: "Batareya holatini tekshiring. So'nggi o'rnatilgan ilovalarni o'chiring. Dasturiy ta'minotni yangilang." },
-            { problem: "Bluetooth ulanmayapti", solution: "Bluetooth'ni o'chirib, qayta yoqing. Qurilmalarni 'unpair' qilib, qayta ulang." },
-            { problem: "SD-karta o'qimayapti", solution: "SD-kartani tozalang va qayta joylashtiring. Boshqa qurilmada sinab ko'ring. Agar ishlamasa, karta buzilgan bo'lishi mumkin." },
-            { problem: "Ekran qotib qoldi", solution: "Telefonni **majburiy qayta ishga tushirish (Force Restart)** tugmalar kombinatsiyasidan foydalaning." },
-            { problem: "Zaryadlash porti bo'shashgan", solution: "Bu jismoniy shikastlanish bo'lishi mumkin. Portni almashtirish zarur." },
-            { problem: "Telefon doimiy qayta ishga tushmoqda", solution: "**Telefonni 'xavfsiz rejimda' (safe mode) ishga tushirib**, muammoli ilovalarni aniqlang." },
-            { problem: "Telefon xotirasi to'lib ketgan", solution: "Keraksiz rasm, video va ilovalarni o'chiring. Bulutli xotiradan yoki SD-kartadan foydalaning." },
-            { problem: "Eshitish dinamiki ishlamayapti", solution: "Telefonni jim rejimdan chiqaring. Dinamik teshigini tozalang." },
-            { problem: "Telefon suvga tushib ketdi", solution: "Darhol **telefonni o'chiring** va uni guruchga qo'ying yoki professionalga murojaat qiling." },
-            { problem: "Telefon parolini unutdim", solution: "Bu holatda, telefonni to'liq o'chirish (Factory Reset) lozim. Lekin bu barcha ma'lumotlaringizni o'chirib yuboradi." },
-            { problem: "Ekran sensorlari ishlamayapti", solution: "Sensor sirtini tozalang. Ekran himoya plyonkasini olib tashlab sinab ko'ring. Agar muammo davom etsa, **displeyni almashtirish zarur**." },
-            { problem: "Ekran miltillamoqda", solution: "Ekran yorug'ligini avtomatik sozlash rejimini o'chirib ko'ring. Agar bu yordam bermasa, displeyda muammo bor." },
-            { problem: "Telefon chaqiruvlari uzilib qolmoqda", solution: "Tarmoq signalini tekshiring. SIM kartani qayta joylashtiring." },
-            { problem: "GPS aniqlamayapti", solution: "Joylashuvni aniqlash (Location) funksiyasi yoqilganligini tekshiring. Telefonni qayta ishga tushiring." },
-            { problem: "Qo'ng'iroq paytida ovozim eshitilmayapti", solution: "Qo'ng'iroq paytida mikrofon yopilmaganligini tekshiring. Mikrofon teshiklarini tozalang." },
-            { problem: "Telefon avtomatik ravishda ilovalarni yopmoqda", solution: "Bu RAM xotirasining yetishmasligi bilan bog'liq bo'lishi mumkin. Keraksiz fon ilovalarini yoping." },
-            { problem: "Klaviatura ko'rinmayapti", solution: "Sozlamalardan klaviatura ilovasining ma'lumotlarini o'chiring. Boshqa klaviaturani yuklab olib sinab ko'ring." },
-            { problem: "SIM karta tanilmayapti", solution: "SIM kartani tozalang va qayta joylashtiring. Boshqa SIM karta bilan sinab ko'ring." },
-            { problem: "Telefon quvvatdan o'chmayapti", solution: "Quvvat tugmasini uzoq bosib turing. Agar o'chmasa, batareyani chiqarib oling yoki ustaga murojaat qiling." },
-            { problem: "Telefoningizga kirish qiyin bo'lmoqda", solution: "Ekran himoyachisini tozalang. Agar muammo hali ham mavjud bo'lsa, sensorlar yuzasidagi kir bo'lishi mumkin." },
-            { problem: "Telefon tez-tez muzlab qolmoqda", solution: "Operativ xotirani tozalang. Fon ilovalarini yoping. Telefoningizning dasturiy ta'minotini yangilang." },
-            { problem: "Telefon yonmayapti", solution: "Zaryadga qo'ying va 15-20 daqiqa kuting. Agar yonmasa, zaryadlovchi kabelni va blokni almashtirib ko'ring." },
-            { problem: "Telefonim ovoz yozmayapti", solution: "Mikrofon teshiklarini tozalang. Ilova ruxsatlarini tekshiring. Boshqa ilovada yozib ko'ring." },
-            { problem: "Telefonimda virus bor", solution: "Antivirus ilovasini o'rnating va to'liq skanerlashni amalga oshiring. Shubhali ilovalarni o'chiring." },
-            { problem: "Ekran ranglari buzilgan", solution: "Ekran sozlamalarini tekshiring. Rang rejimini o'zgartiring. Agar muammo davom etsa, **displeyning o'zi buzilgan** bo'lishi mumkin." },
-            { problem: "Telefon signal ushlamayapti", solution: "SIM kartaning to'g'ri joylashganligini tekshiring. Tarmoq sozlamalarini 'avtomatik' holatiga o'tkazing." },
-            { problem: "Telefon ovozli qo'ng'iroqlarni amalga oshira olmayapti", solution: "SIM kartani almashtirib ko'ring. Tarmoq sozlamalarini 'avtomatik' holatiga o'tkazing." },
-            { problem: "Telefon sensorlari ishlamayapti", solution: "Telefonni qayta ishga tushiring. Telefonni 'Factory Reset' qilib ko'ring." },
-            { problem: "Telefon ekranida qora joy paydo bo'ldi", solution: "Bu displeyning jiddiy shikastlanishi bilan bog'liq. Displey almashtirilishi zarur." },
-            { problem: "Telefonimni kompyuter tanimayapti", solution: "USB kabelini almashtirib ko'ring. Kompyuterda draiverlarni tekshiring. Telefonning USB sozlamalarini 'Fayl uzatish' rejimiga o'tkazing." },
-            { problem: "Telefonning vibratsiyasi ishlamayapti", solution: "Vibratsiya sozlamalarini tekshiring. Agar ular yoqiq bo'lsa, **vibratsiya motorida muammo bor**." },
-            { problem: "Telefon orqa qopqog'i ko'chib ketdi", solution: "Bu batareyaning shishganligidan dalolat berishi mumkin. **Darhol professionalga murojaat qiling**, chunki bu xavfli bo'lishi mumkin." },
-            { problem: "Telefon keshini tozalash kerakmi?", solution: "Ha, muntazam ravishda ilovalar keshini tozalash telefonning tez ishlashiga yordam beradi." },
-            { problem: "Face ID / Barmoq izi ishlamayapti", solution: "Sensor sirtini tozalang. Barmoq izini yoki yuzni qayta kiritib ko'ring. Agar bu yordam bermasa, **sensorning o'zi buzilgan** bo'lishi mumkin." },
-            { problem: "Ekran ustida dog'lar paydo bo'ldi", solution: "Bu displeyning suyuqlik bilan aloqasi yoki ichki shikastlanishi natijasida yuzaga keladi. **Displey almashtirilishi zarur**." },
-            { problem: "Telefonim zaryad olayotgan paytda shovqin qilmoqda", solution: "Bu odatda zaryadlovchi adapter yoki kabel bilan bog'liq. Ularni boshqa, sifatliroq zaryadlovchiga almashtirib ko'ring." },
-            { problem: "Telefon ekrani o'chib-yonmoqda", solution: "Bu displey kabelining bo'shashganligi yoki shikastlanganligi bilan bog'liq. **Displeyni ta'mirlash kerak** bo'lishi mumkin." },
-            { problem: "Telefoningizga kirish qiyin bo'lmoqda", solution: "Ekran himoyachisini tozalang. Agar muammo hali ham mavjud bo'lsa, sensorlar yuzasidagi kir bo'lishi mumkin." },
-            { problem: "Telefonning ovozi pasayib ketdi", solution: "Dinamik teshiklarini tozalang. Agar ovoz hali ham past bo'lsa, **dinamikni almashtirish zarur** bo'lishi mumkin." },
-        ];
+    <!-- HOME TAB -->
+    <section data-tab="home" class="tab glass">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+        <div style="padding:10px;border-radius:16px;background:linear-gradient(135deg,var(--accent),var(--primary)); color:#fff;">📱</div>
+        <div>
+          <h2 style="margin:0">Telefon Ustaxona</h2>
+          <p class="muted" style="margin-top:2px">Professional servis. Aniq diagnoz. Tez yordam.</p>
+        </div>
+      </div>
+      <p>Qurilmangizni tanlang va muammoni yozing — AI batafsil tahlil va bosqichma‑bosqich tavsiya beradi.</p>
+      <div class="grid-2" style="margin-top:12px;">
+        <button class="btn primary" onclick="goTab('brand')">Brend/Model</button>
+        <button class="btn" onclick="goTab('ai')">AI tahlil</button>
+      </div>
+      <div class="glass" style="margin-top:12px; display:flex; align-items:center; justify-content:space-between; gap:8px;">
+        <div>
+          <div style="font-weight:600">📣 Teleshop kanali</div>
+          <div class="muted" style="font-size:12px">Yangiliklar, aksiyalar va maslahatlar</div>
+        </div>
+        <a class="btn primary" href="https://t.me/teleshopuz" target="_blank" rel="noopener">Obuna bo‘lish</a>
+      </div>
+    </section>
 
-        // Function to render problems
-        function renderProblems(problems) {
-            problemsList.innerHTML = '';
-            if (problems.length === 0) {
-                problemsList.innerHTML = '<p class="text-center text-gray-500 text-base mt-4">Afususki, siz so\'ragan muammo topilmadi.</p>';
-                return;
-            }
-            problems.forEach((item, index) => {
-                const problemContainer = document.createElement('div');
-                problemContainer.className = 'problem-container';
-                
-                const problemBlock = document.createElement('div');
-                problemBlock.className = 'problem-block p-4 rounded-lg shadow-sm text-gray-800 font-medium text-base cursor-pointer flex justify-between items-center';
-                problemBlock.innerHTML = `
-                    <span class="font-semibold">${item.problem}</span>
-                    <i class="fas fa-chevron-down faq-chevron text-blue-500 text-lg ml-4"></i>
-                `;
-                problemBlock.dataset.index = index;
-                
-                const solutionBox = document.createElement('div');
-                solutionBox.className = 'solution-box rounded-lg hidden';
-                solutionBox.innerHTML = `
-                    <h3 class="text-lg font-bold text-gray-800 mb-2">Yechim:</h3>
-                    <p class="text-gray-700 leading-relaxed text-sm">${item.solution}</p>
-                `;
-                
-                problemContainer.appendChild(problemBlock);
-                problemContainer.appendChild(solutionBox);
-                problemsList.appendChild(problemContainer);
-            });
-        }
+    <section class="glass">
+      <div class="grid-3">
+        <button class="btn" onclick="goTab('brand')">🏷️<span style="font-size:11px">Brend</span></button>
+        <button class="btn" onclick="goTab('ai')">🤖<span style="font-size:11px">AI</span></button>
+        <a class="btn" href="https://t.me/teleshopuz" target="_blank" rel="noopener">📣<span style="font-size:11px">Teleshop</span></a>
+      </div>
+    </section>
 
-        // Search function
-        function searchProblems() {
-            const query = problemInput.value.toLowerCase().trim();
-            const filteredProblems = allProblems.filter(item => 
-                item.problem.toLowerCase().includes(query)
-            );
-            renderProblems(filteredProblems);
-        }
-        
-        // Initial render on page load
-        window.onload = function() {
-            renderProblems(allProblems);
-            searchButton.addEventListener('click', searchProblems);
-            problemInput.addEventListener('input', searchProblems);
-        };
+    <section id="historyCard" class="glass hidden">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+        <div>
+          <h3>AI so'rovlar tarixi</h3>
+          <p class="muted">Oxirgi 10 ta</p>
+        </div>
+        <button class="btn" onclick="clearHistory()">🧹 Tozalash</button>
+      </div>
+      <div id="historyList" style="display:grid;gap:8px;margin-top:8px;"></div>
+    </section>
 
-        // Click event listener for FAQ-style accordion
-        problemsList.addEventListener('click', (e) => {
-            const problemBlock = e.target.closest('.problem-block');
-            if (problemBlock) {
-                const solutionBox = problemBlock.nextElementSibling;
-                const chevronIcon = problemBlock.querySelector('.faq-chevron');
+    <!-- BRAND/MODEL TAB -->
+    <section data-tab="brand" class="tab glass hidden">
+      <h3>Qurilmangizni tanlang</h3>
+      <p class="muted">Brend va modelni belgilang.</p>
+      <div class="row" style="margin-top:8px;">
+        <div>
+          <label>Brend</label>
+          <select id="brand" class="select"></select>
+        </div>
+        <div>
+          <label>Model</label>
+<input id="model" class="input" placeholder="Modelni qo‘lda yozing (masalan: Redmi Note 12)" />
+        </div>
+        <div class="grid-2">
+          <button class="btn primary" onclick="goTab('ai')">AIga o'tish →</button>
+          <button class="btn" onclick="resetBrandModel()">Tozalash</button>
+        </div>
+      </div>
+    </section>
 
-                // Close other open solutions
-                document.querySelectorAll('.solution-box').forEach(box => {
-                    if (box !== solutionBox && !box.classList.contains('hidden')) {
-                        box.classList.add('hidden');
-                        box.previousElementSibling.querySelector('.faq-chevron').classList.remove('rotate');
-                    }
-                });
+    <!-- AI TAB -->
+    <section data-tab="ai" class="tab glass hidden">
+      <h3>AI Diagnoz</h3>
+      <p class="muted">Muammoni yozing. AI batafsil <b>(sabablar → tekshiruv → yechim → profilaktika)</b> formati bilan javob beradi.</p>
+      <div class="row">
+        <div>
+          <label>Qisqacha muammo (uz/ru)</label>
+          <input id="issue" class="input" placeholder="Masalan: qotib ishlayapti, zaryad olmayapti, ekran sinib qolgan" />
+        </div>
+        <div id="suggestions" class="chips"></div>
+        <div class="grid-2">
+          <button id="aiBtn" class="btn primary">AI tahlil</button>
+          <button class="btn" onclick="setIssue('')">Tozalash</button>
+        </div>
+        <div class="glass hidden" id="aiResultWrap" style="margin-top:2px;">
+          <h3 style="font-size:16px">🤖 AI natijasi</h3>
+          <div id="aiResult" style="margin-top:8px"></div>
+          <div class="badge" style="margin-top:10px" id="aiHint">Yakuniy diagnoz ustada tasdiqlanadi. Muhim ma'lumotlarni zaxiralashni unutmang.</div>
+        </div>
+      </div>
+    </section>
 
-                // Toggle current solution and icon rotation
-                solutionBox.classList.toggle('hidden');
-                chevronIcon.classList.toggle('rotate');
-            }
-        });
-    </script>
+    <!-- HELP TAB -->
+    <section data-tab="help" class="tab glass hidden">
+      <h3>Ma'lumot</h3>
+      <p class="muted">Buyurtma sahifasi yo‘q — faqat AI va brend/model tanlash. Teleshop kanali reklama tugmasi qo‘shildi.</p>
+      <div class="row" style="margin-top:8px;">
+        <div class="badge">Liquid glass UI</div>
+        <div class="badge">Kuchli blur</div>
+        <div class="badge">Pro rang palitrasi</div>
+        <div class="badge">AI batafsil javob</div>
+      </div>
+      <div class="glass" style="margin-top:10px;display:flex;align-items:center;justify-content:space-between;gap:8px;">
+        <div>
+          <div style="font-weight:600">📣 Teleshop kanali</div>
+          <p class="muted" style="margin-top:4px">Yangiliklar, aksiyalar, chegirmalar</p>
+        </div>
+        <a class="btn primary" href="https://t.me/teleshopuz" target="_blank" rel="noopener">Obuna bo‘ling</a>
+      </div>
+    </section>
+  </div>
+
+  <!-- Footer nav -->
+  <div class="footer">
+    <div class="footer-inner">
+      <div class="nav">
+        <button data-nav="home" class="btn active" onclick="goTab('home')">🏠<span>Asosiy</span></button>
+        <button data-nav="brand" class="btn" onclick="goTab('brand')">🏷️<span>Brend</span></button>
+        <button data-nav="ai" class="btn" onclick="goTab('ai')">🤖<span>AI</span></button>
+        <button data-nav="help" class="btn" onclick="goTab('help')">ℹ️<span>Yordam</span></button>
+        <a class="btn" href="https://t.me/teleshopuz" target="_blank" rel="noopener">📣<span>Teleshop</span></a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ——— Telegram WebApp integration ———
+    const tg = window?.Telegram?.WebApp || null;
+    try { tg?.ready(); tg?.expand(); } catch(e){}
+
+    // ——— Theme toggle ———
+    const themeBtn = document.getElementById('themeBtn');
+    const prefers = localStorage.getItem('ux_theme') || (tg?.themeParams?.bg_color ? 'dark' : 'light');
+    if(prefers==='light') document.documentElement.classList.add('light');
+    themeBtn?.addEventListener('click', ()=>{
+      document.documentElement.classList.toggle('light');
+      const isLight = document.documentElement.classList.contains('light');
+      localStorage.setItem('ux_theme', isLight ? 'light' : 'dark');
+    });
+
+    // ——— State ———
+    const state = { brand:'', model:'', issue:'', history: JSON.parse(localStorage.getItem('tx_history')||'[]') };
+
+    // ——— Data ———
+    const BRANDS = {
+      Apple:["iPhone 15 Pro Max","iPhone 15 Pro","iPhone 14 Pro","iPhone 13","iPhone 12"],
+      Samsung:["Galaxy S24 Ultra","Galaxy S24","Galaxy S23","Galaxy A55","Galaxy A34"],
+      Xiaomi:["13T Pro","Redmi Note 13","Poco F5","Mi 11"],
+      Huawei:["P60 Pro","Mate 50","Nova 11"],
+      Oppo:["Find X7","Reno 11","A78"],
+      Vivo:["X100 Pro","V29","Y36"],
+      Realme:["GT Neo 5","11 Pro+","C55"],
+      Nokia:["G42","X30"],
+    };
+
+    const ISSUE_KB = [
+      { tag:'Ekran', hints:["Ekran sinib qolgan","Sensor ishlamayapti","Chiziqlar paydo bo'lgan","Nur so'nishi"] },
+      { tag:'Batareya', hints:["Tez zaryad tugaydi","Zaryad olmyapti","Qizib ketadi","% sakrab ketadi"] },
+      { tag:'Suv', hints:["Suv tushib ketdi","Mikrofon past","Dinamik jim"] },
+      { tag:'Kamera', hints:["Orqa kamera xira","Old kamera ochilmaydi","Qora ekran"] },
+      { tag:'Tarmoq', hints:["SIM ko'rmayapti","Wi‑Fi uzilib qoladi","IMEI yo'q"] },
+      { tag:'Ishlash', hints:["Qotib ishlayapti","Sekinlashib ketdi","O'zi o'chib qoladi","Restart bo'ladi"] },
+    ];
+
+    // ——— Expanded AI rules ———
+    const AI_RULES = [
+      { key:'display', pattern: /(ekran|sensor|display|sin|chiziq)/i, title:"Ekran/Touch", causes:["Sensor shikasti","OLED/LCD nosozligi","Shleyf/konnektor bo'shashi","Yiqilishdan keyingi ichki zarba"], actions:["Modul tekshiruvi","Sensor/OLED test","Shleyfni qayta ulash","Modul/almashtirish"], eta:"1–2 soat", price:"indikativ" },
+      { key:'battery', pattern: /(batareya|zaryad|quvvat|%|tez tugaydi|port)/i, title:"Batareya/Zaryad", causes:["Batareya eskirgan","Zaryad porti changlangan","Adapter/kabel muammosi","Background ilovalar ko'pligi"], actions:["Battery health test","Portni tozalash","Original adapter bilan tekshirish","Batareyani almashtirish"], eta:"30–60 daqiqa", price:"indikativ" },
+      { key:'water', pattern: /(suv|namlik|ho'l|nam)/i, title:"Namlik", causes:["Korroziya","Qisqa tutashuv","Dinamik/Mikrofon namlanishi"], actions:["To'liq tozalash va quritish","Kontaktlarni reanimatsiya","Zararlangan modulni almashtirish"], eta:"2–4 soat", price:"indikativ" },
+      { key:'camera', pattern: /(kamera|selfi|orqa|video)/i, title:"Kamera", causes:["Modul shikasti","Shisha qopqoq chizilgan","Dasturiy xato"], actions:["Modul test","Shisha/Modul almashtirish","Kamera ilovasi ma'lumotlarini tozalash"], eta:"1–2 soat", price:"indikativ" },
+      { key:'network', pattern: /(tarmoq|sim|imei|wifi|wi-?fi|signal)/i, title:"Tarmoq", causes:["Antenna uzuqligi","Baseband nosozligi","Operator muammosi"], actions:["Baseband testi","Antenna ulash/IC ishlari","APN/Sozlamalarni tiklash"], eta:"2–6 soat", price:"indikativ" },
+      { key:'lag', pattern: /(qotib|qotadi|qotib ishlayapti|sekin|lag|o'chib|ochmayapti|restart|hanging|freeze)/i, title:"Ishlash/Sezilarli sekinlashuv", causes:["Xotira to'lib ketgan","Kesh va vaqtinchalik fayllar","Ilova konfliktlari","Qizish/termal throttling","Dasturiy (OS) buzilish"], actions:["Xotirani bo'shatish (10–20%)","Keshni tozalash","So'nggi o'rnatilgan ilovalarni olib tashlash","Tizimni yangilash yoki qayta yozish","Sovutish tizimini tekshirish"], eta:"30–90 daqiqa", price:"indikativ" },
+    ];
+
+    // ——— Elements ———
+    const brandEl = document.getElementById('brand');
+    const modelEl = document.getElementById('model');
+    const issueEl = document.getElementById('issue');
+    const suggWrap = document.getElementById('suggestions');
+    const aiBtn = document.getElementById('aiBtn');
+    const aiWrap = document.getElementById('aiResultWrap');
+    const aiRes = document.getElementById('aiResult');
+    const histCard = document.getElementById('historyCard');
+    const histList = document.getElementById('historyList');
+
+    // ——— Init brand list ———
+    function initBrands(){
+      brandEl.innerHTML = '<option value="" disabled '+(state.brand?'':'selected')+'>Masalan, Apple<\/option>' +
+        Object.keys(BRANDS).map(b=>`<option ${state.brand===b?'selected':''} value="${b}">${b}<\/option>`).join('');
+      brandEl.disabled = false;
+      updateModels();
+    }
+    function updateModels(){
+      const arr = BRANDS[state.brand] || [];
+      modelEl.innerHTML = arr.length ? arr.map(m=>`<option ${state.model===m?'selected':''} value="${m}">${m}<\/option>`).join('')
+                                     : '<option selected>Avval brendni tanlang<\/option>';
+      modelEl.disabled = !arr.length;
+    }
+    brandEl.addEventListener('change', e=>{ state.brand = e.target.value; state.model=''; updateModels(); });
+    modelEl.addEventListener('change', e=>{ state.model = e.target.value; });
+    function resetBrandModel(){ state.brand=''; state.model=''; initBrands(); }
+    window.resetBrandModel = resetBrandModel;
+
+    // ——— Suggestions as you type ———
+    function renderSuggestions(){
+      const q = (state.issue||'').toLowerCase();
+      const items = [];
+      ISSUE_KB.forEach(b=> b.hints.forEach(h=>{ if(h.toLowerCase().includes(q) && !items.includes(h)) items.push(h); }));
+      suggWrap.innerHTML = items.slice(0,8).map(s=>`<span class="chip" onclick="setIssue('${s.replace(/'/g,"&#39;")}')">${s}<\/span>`).join('');
+    }
+    function setIssue(v){ state.issue = v; issueEl.value = v; renderSuggestions(); aiWrap.classList.add('hidden'); }
+    window.setIssue = setIssue;
+    issueEl.addEventListener('input', e=>{ setIssue(e.target.value); });
+
+    // ——— Detailed AI renderer ———
+    function renderAIBlock(rule, ctx){
+      const { title, causes, actions, eta, price } = rule;
+      const header = `<div class="badge">Bo'lim: ${title}</div>`;
+      const summary = `<div class="glass"><h3 style="font-size:14px;margin-bottom:4px">Qisqa xulosa</h3><p>So'rovingiz: <b>${escapeHTML(ctx.query)}</b>. ${title} bo'yicha ehtimoliy nosozliklar topildi. Pastda bosqichma‑bosqich yo'riqnoma berildi.</p></div>`;
+      const causeList = `<div class="glass"><h3 style="font-size:14px;margin-bottom:4px">Ehtimoliy sabablar</h3><ul style="margin:0;padding-left:18px;color:var(--text);">${causes.map(c=>`<li>${c}<\/li>`).join('')}</ul></div>`;
+      const diag = `<div class="glass"><h3 style="font-size:14px;margin-bottom:4px">Uy sharoitida tekshiruv</h3><ol style="margin:0;padding-left:18px;color:var(--text);">${composeHomeChecks(rule.key).map(x=>`<li>${x}<\/li>`).join('')}</ol></div>`;
+      const fix = `<div class="glass"><h3 style="font-size:14px;margin-bottom:4px">Tavsiya etilgan yechim</h3><ul style="margin:0;padding-left:18px;color:var(--text);">${actions.map(a=>`<li>${a}<\/li>`).join('')}</ul></div>`;
+      const meta = `<div class="grid-2"><div class="badge">Vaqt: ${eta}</div><div class="badge">Narx: ${price}</div></div>`;
+      const safety = `<div class="glass"><h3 style=\"font-size:14px;margin-bottom:4px\">Ma'lumot xavfsizligi</h3><ul style=\"margin:0;padding-left:18px;color:var(--text);\"><li>Zaxira nusxa yarating (Google/ iCloud).</li><li>Namlik/ekran muammosida qurilmani ishlatishni cheklang.</li><li>Rasmiy zaryadlovchi va sifatli kabeldan foydalaning.</li></ul></div>`;
+      const promo = `<div class="glass" style="display:flex;align-items:center;justify-content:space-between;gap:8px;"><div><div style="font-weight:600">📣 Teleshop</div><p class="muted" style="margin-top:4px">Yangiliklar va aksiyalar</p></div><a class="btn primary" href="https://t.me/teleshopuz" target="_blank" rel="noopener">Obuna bo‘ling</a></div>`;
+      return [header, summary, causeList, diag, fix, meta, safety, promo].join('');
+    }
+
+    function composeHomeChecks(key){
+      switch(key){
+        case 'display':
+          return ["Qattiq himoya oynasini olib sinab ko'ring","Screenshotda chiziq ko'rinadimi tekshiring (ko'rinsa — soft, ko'rinmasa — hardware)","Sensor test ilovasi orqali multi‑touch tekshiruvi"];
+        case 'battery':
+          return ["Boshqa adapter/kabel bilan sinab ko'ring","Zaryad portini ehtiyotkorlik bilan tozalang","Batareya sog'ligini tekshiring (Android *AccuBattery*, iOS *Settings → Battery → Health*)"];
+        case 'water':
+          return ["Qurilmani o'chiring, zaryadga qo'ymang","SIM tray va portlarni quritishga urinmang (issiq fen yo'q)","Servisga tezda murojaat qiling — korroziya vaqt bilan kuchayadi"];
+        case 'camera':
+          return ["Kamerani boshqa ilovada sinab ko'ring","Kamera ilovasi keshini tozalang","Linza/qopqoqni tozalang"];
+        case 'network':
+          return ["Aviorejimni 30 soniyaga yoqib o'chiring","APN/Sozlamalarni standartga qaytaring","SIM kartani boshqa telefonda sinab ko'ring"];
+        case 'lag':
+          return ["So'nggi o'rnatilgan ilovalarni vaqtincha o'chiring","Bo'sh joyni 10–20% gacha oching","Tizim yangilanishini o'rnating","Qizish bo'lsa qopqoqsiz ishlatib ko'ring"];
+        default:
+          return ["Umumiy tekshiruv: qayta ishga tushiring, yangilanishlarni tekshiring, bo'sh joy qoldiring"];        
+      }
+    }
+
+    function escapeHTML(str){ return (str||'').replace(/[&<>"']/g, s=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[s])); }
+
+    aiBtn.addEventListener('click', async ()=>{
+      const text = [state.issue, state.model, state.brand].join(' ').trim();
+      if(!text){ alert("Muammoni yozing"); return; }
+
+      // Local rule match
+      const rule = AI_RULES.find(r=> r.pattern.test(text));
+
+      // Optional GPT backend (if you wire /ai)
+      // const gpt = await callGPT(text).catch(()=>null);
+
+      const blocks = [];
+      if(rule) blocks.push(renderAIBlock(rule, { query: text }));
+
+      // If GPT supplied, append below (uncomment when backend ready)
+      // if(gpt && gpt.detail){
+      //   blocks.push(`<div class="glass"><h3 style="font-size:14px">GPT qo'shimcha tafsiloti</h3><p>${escapeHTML(gpt.detail)}</p></div>`);
+      // }
+
+      // If no rule hit, give a generic but detailed template
+      if(!blocks.length){
+        blocks.push(`<div class=\"glass\"><h3 style=\"font-size:14px\">Umumiy yo'riqnoma</h3><p>So'rov: <b>${escapeHTML(text)}</b>. Muammo aniq emas. Iltimos, simptomlarni batafsil yozing: qachondan boshlangan, qaysi ilovada, xato xabarlari, suv/zarba bo'lgan‑bo'lmagan.</p></div>`);
+      }
+
+      // Special quick help for lag/freeze even if another category matched too
+      if(/qotib|lag|sekin|restart|o'chib|freeze|hanging/i.test(text)){
+        blocks.push(`<div class=\"glass\"><h3 style=\"font-size:14px\">Tez yordam: qotib ishlash</h3><ol style=\"margin:0;padding-left:18px\"><li>Fon ilovalarni yopish va keshni tozalash</li><li>Ilova ruxsatlarini tartibga keltirish (Background limits)</li><li>"Safe mode"da ishga tushirib sinash</li><li>Muammo davom etsa: dasturiy qayta yozish tavsiya etiladi</li></ol></div>`);
+      }
+
+      aiRes.innerHTML = blocks.join('');
+      aiWrap.classList.remove('hidden');
+
+      pushHistory({ brand: state.brand, model: state.model, issue: state.issue });
+    });
+
+    async function callGPT(query){
+      // Backendda /ai endpointingiz OpenAI bilan muloqot qiladi.
+      // return fetch('/ai', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ q: query, brand: state.brand, model: state.model }) }).then(r=>r.json());
+      return null;
+    }
+
+    // ——— History ———
+    function pushHistory(item){
+      const rec = { ...item, ts: Date.now() };
+      const arr = [rec, ...state.history].slice(0,10);
+      state.history = arr; localStorage.setItem('tx_history', JSON.stringify(arr));
+      renderHistory();
+    }
+    function clearHistory(){
+      state.history = []; localStorage.removeItem('tx_history'); renderHistory();
+    }
+    window.clearHistory = clearHistory;
+
+    function renderHistory(){
+      if(!state.history.length){ histCard.classList.add('hidden'); return; }
+      histCard.classList.remove('hidden');
+      histList.innerHTML = state.history.map(h=>{
+        const t = new Date(h.ts).toLocaleTimeString();
+        const bm = `${h.brand||'—'} ${h.model||''}`.trim();
+        const iss = h.issue||'—';
+        return `<div class="glass" style="padding:10px;display:flex;align-items:center;justify-content:space-between;gap:8px;">\
+          <div style="min-width:0">\
+            <div style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${bm||'Model kiritilmagan'}<\/div>\
+            <div class="muted" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${iss}<\/div>\
+          <\/div>\
+          <span class="badge">${t}<\/span>\
+        <\/div>`
+      }).join('');
+    }
+
+    // ——— Tabs ———
+    function goTab(key){
+      document.querySelectorAll('.tab').forEach(el=> el.classList.add('hidden'));
+      document.querySelector(`section[data-tab="${key}"]`)?.classList.remove('hidden');
+      document.querySelectorAll('.nav .btn').forEach(b=> b.classList.remove('active'));
+      document.querySelector(`.nav [data-nav="${key}"]`)?.classList.add('active');
+      if(key==='home') renderHistory();
+      window.scrollTo({top:0, behavior:'smooth'});
+    }
+    window.goTab = goTab;
+
+    // ——— Quick send ———
+    const pingBtn = document.getElementById('pingBtn');
+    pingBtn.addEventListener('click', ()=> sendQuick('ping'));
+    function sendQuick(type){ try{ tg?.sendData?.(JSON.stringify({action:type, ts:Date.now()})); }catch(e){} }
+
+    // ——— Boot ———
+    function renderSuggestionsBoot(){
+      const base = ["Qotib ishlayapti","Zaryad olmayapti","Ekran sinib qolgan","SIM ko'rmayapti","Wi‑Fi uzilib qoladi","Kamera xira"];
+      suggWrap.innerHTML = base.map(s=>`<span class=\"chip\" onclick=\"setIssue('${s}')\">${s}<\/span>`).join('');
+    }
+    (function boot(){
+      initBrands();
+      renderHistory();
+      renderSuggestionsBoot();
+    })();
+  </script>
 </body>
 </html>
