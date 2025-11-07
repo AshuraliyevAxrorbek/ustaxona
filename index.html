@@ -129,25 +129,164 @@
     .btn.ghost{ background: transparent; }
     .btn.block{ width: 100%; }
 
-    .row{ display:grid; grid-template-columns: 1fr; gap: 10px; }
+.input,
+.select,
+textarea{
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-size: 14px;
+  border: 1px solid var(--border);
 
-    .input, .select, textarea{ width:100%; padding: 12px 12px; border-radius: 14px; background: color-mix(in srgb, var(--glass-2) 70%, transparent); color: var(--text); border:1px solid var(--border); outline: none; box-shadow: 0 0 0 0 var(--ring); transition: box-shadow .2s ease, border-color .2s ease, background .2s ease; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
-    .input:focus, .select:focus, textarea:focus{ border-color: transparent; box-shadow: 0 0 0 6px var(--ring); }
-    label{ font-size: 12px; color: var(--muted); margin-bottom: 4px; display:block; }
+  /* Blurni olib tashlaymiz — chunki iOS/Safari/Telegram WebView dropdownni o‘chirmaydi */
+  background: rgba(255,255,255,0.92);
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
 
-    .chips{ display:flex; flex-wrap: wrap; gap: 8px; }
-    .chip{ padding: 6px 10px; border-radius: 999px; background: var(--chip); color: var(--chip-text); cursor:pointer; border:1px solid var(--border); font-size:12px; }
+  color: var(--text);
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  pointer-events: auto !important;
+  position: relative;
+  z-index: 9999; /* dropdown ustida chiqadi */
+}
 
-    .grid-3{ display:grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
-    .grid-2{ display:grid; grid-template-columns: repeat(2,1fr); gap: 8px; }
+/* DARK MODE uchun background o‘zgartiramiz */
+:root .input,
+:root .select,
+:root textarea {
+  background: rgba(15,23,42,0.85);
+  color: var(--text);
+}
+
+/* LIGHT MODE uchun */
+.light .input,
+.light .select,
+.light textarea {
+  background: rgba(255,255,255,0.92);
+  color: #0f172a;
+}
+
+/* FOCUS effekti */
+.input:focus,
+.select:focus,
+textarea:focus{
+  border-color: transparent;
+  box-shadow: 0 0 0 6px var(--ring);
+}
+
+/* Placeholder rangi */
+.input::placeholder,
+textarea::placeholder {
+  color: var(--muted);
+  opacity: .9;
+}
+
+/* Row */
+.row{
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+/* Labels */
+label{
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 4px;
+  display: block;
+}
+
+/* Suggestions / Chips */
+.chips{ 
+  display:flex; 
+  flex-wrap: wrap; 
+  gap: 8px; 
+}
+.chip{
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: var(--chip);
+  color: var(--chip-text);
+  cursor: pointer;
+  border: 1px solid var(--border);
+  font-size: 12px;
+}
+
+/* Grid helpers */
+.grid-3{ display:grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+.grid-2{ display:grid; grid-template-columns: repeat(2,1fr); gap: 8px; }
 
     /* ————— Footer nav ————— */
-    .footer{ position: fixed; left:0; right:0; bottom: 12px; }
-    .footer-inner{ margin: 0 auto; max-width: 460px; padding: 6px; }
-    .nav{ display:grid; grid-template-columns: repeat(5,1fr); gap:6px; background: linear-gradient(180deg, var(--glass), var(--glass-2)); border:1px solid var(--border); border-radius: 20px; padding: 6px; box-shadow: 0 10px 30px rgba(0,0,0,0.28); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
-    .nav button, .nav a{ border-radius: 14px; padding: 8px 4px; font-size: 11px; display:flex; flex-direction:column; align-items:center; }
-    .nav .active{ background: linear-gradient(135deg, var(--primary), var(--accent)); color: #fff; border-color: transparent; }
 
+.tab{
+  opacity:1;
+  transform:translateY(0);
+  transition: opacity .35s ease, transform .35s ease;
+}
+.tab.hidden{
+  opacity:0;
+  transform:translateY(14px);
+  pointer-events:none;
+}
+
+/* --- Navbar Liquid Glass (iPhone style) --- */
+.footer{
+  position: fixed;
+  left:0; right:0; bottom: 26px;
+  z-index: 50;
+}
+.footer-inner{
+  margin: 0 auto;
+  max-width: 460px;
+  padding: 6px;
+}
+
+.nav{
+  display:grid;
+  grid-template-columns: repeat(4,1fr);
+  gap:8px;
+
+  /* Liquid glass */
+  background: color-mix(in srgb, var(--glass) 78%, transparent);
+  border: 1px solid var(--border);
+  border-radius: 32px;              /* iPhone pill */
+  padding: 10px 10px;
+  box-shadow: 0 20px 48px rgba(0,0,0,0.42);
+
+  backdrop-filter: blur(26px) saturate(180%) brightness(1.15);
+  -webkit-backdrop-filter: blur(26px) saturate(180%) brightness(1.15);
+
+  transition: background .45s ease, backdrop-filter .45s ease;
+}
+
+/* Large buttons */
+.nav button, .nav a{
+  padding: 10px 0;
+  border-radius: 22px;              /* rounder */
+  font-size: 12px;
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+  align-items:center;
+  color: var(--text);
+  transition: background .25s ease, color .2s ease;
+}
+
+.nav .active{
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  color:#fff;
+  border-color:transparent;
+  box-shadow:0 0 12px rgba(37,99,235,0.45);
+}
+
+/* Light mode pill */
+.light .nav{
+  background: rgba(255,255,255,0.55);
+  box-shadow: 0 20px 48px rgba(0,0,0,0.18);
+  backdrop-filter: blur(26px) saturate(180%) brightness(1.35);
+}
     /* ————— Helpers ————— */
     .hidden{ display:none !important; }
     .muted{ color: var(--muted); }
@@ -172,9 +311,8 @@
         </div>
       </div>
       <div style="display:flex;gap:8px;">
-        <a class="btn ghost" href="https://t.me/teleshopuz" target="_blank" rel="noopener">📣 Teleshop</a>
+        <a class="btn ghost" href="https://t.me/teleshopuz" target="_blank" rel="noopener">Teleshop</a>
         <button id="themeBtn" class="btn ghost" title="Tun/Tong">🌗</button>
-        <button id="pingBtn" class="btn ghost" title="Ping">📨</button>
       </div>
     </div>
   </div>
@@ -205,13 +343,15 @@
       </div>
     </section>
 
-    <section class="glass">
-      <div class="grid-3">
-        <button class="btn" onclick="goTab('brand')">🏷️<span style="font-size:11px">Brend</span></button>
-        <button class="btn" onclick="goTab('ai')">🤖<span style="font-size:11px">AI</span></button>
-        <a class="btn" href="https://t.me/teleshopuz" target="_blank" rel="noopener">📣<span style="font-size:11px">Teleshop</span></a>
-      </div>
-    </section>
+    <div class="glass" style="margin-top:12px">
+    <div class="grid-3">
+        <button class="btn" onclick="goTab('brand')">🏷️ Brend</button>
+        <button class="btn" onclick="goTab('ai')">🤖 AI</button>
+        <a class="btn" href="https://t.me/teleshopuz" target="_blank">📣 Teleshop</a>
+    </div>
+    </div>
+
+
 
     <section id="historyCard" class="glass hidden">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
@@ -226,22 +366,25 @@
 
     <!-- BRAND/MODEL TAB -->
     <section data-tab="brand" class="tab glass hidden">
-      <h3>Qurilmangizni tanlang</h3>
-      <p class="muted">Brend va modelni belgilang.</p>
-      <div class="row" style="margin-top:8px;">
-        <div>
-          <label>Brend</label>
-          <select id="brand" class="select"></select>
+        <h3>Qurilmangizni tanlang</h3>
+        <p class="muted">Brend va modelni belgilang.</p>
+
+        <div class="row" style="margin-top:8px;">
+            <div>
+            <label for="brand">Brend</label>
+            <select id="brand" class="select"></select>
+            </div>
+
+            <div>
+            <label for="model">Model</label>
+            <select id="model" class="select" disabled></select>
+            </div>
+
+            <div class="grid-2">
+            <button class="btn primary" onclick="goTab('ai')">AIga o'tish →</button>
+            <button class="btn" onclick="resetBrandModel()">Tozalash</button>
+            </div>
         </div>
-        <div>
-          <label>Model</label>
-<input id="model" class="input" placeholder="Modelni qo‘lda yozing (masalan: Redmi Note 12)" />
-        </div>
-        <div class="grid-2">
-          <button class="btn primary" onclick="goTab('ai')">AIga o'tish →</button>
-          <button class="btn" onclick="resetBrandModel()">Tozalash</button>
-        </div>
-      </div>
     </section>
 
     <!-- AI TAB -->
@@ -294,7 +437,6 @@
         <button data-nav="brand" class="btn" onclick="goTab('brand')">🏷️<span>Brend</span></button>
         <button data-nav="ai" class="btn" onclick="goTab('ai')">🤖<span>AI</span></button>
         <button data-nav="help" class="btn" onclick="goTab('help')">ℹ️<span>Yordam</span></button>
-        <a class="btn" href="https://t.me/teleshopuz" target="_blank" rel="noopener">📣<span>Teleshop</span></a>
       </div>
     </div>
   </div>
@@ -319,14 +461,107 @@
 
     // ——— Data ———
     const BRANDS = {
-      Apple:["iPhone 15 Pro Max","iPhone 15 Pro","iPhone 14 Pro","iPhone 13","iPhone 12"],
-      Samsung:["Galaxy S24 Ultra","Galaxy S24","Galaxy S23","Galaxy A55","Galaxy A34"],
-      Xiaomi:["13T Pro","Redmi Note 13","Poco F5","Mi 11"],
-      Huawei:["P60 Pro","Mate 50","Nova 11"],
-      Oppo:["Find X7","Reno 11","A78"],
-      Vivo:["X100 Pro","V29","Y36"],
-      Realme:["GT Neo 5","11 Pro+","C55"],
-      Nokia:["G42","X30"],
+    Apple: [
+        // ✅ iPhone 15 seriyasi
+        "iPhone 15 Pro Max", "iPhone 15 Pro", "iPhone 15 Plus", "iPhone 15",
+        // ✅ iPhone 14 seriyasi
+        "iPhone 14 Pro Max", "iPhone 14 Pro", "iPhone 14 Plus", "iPhone 14",
+        // ✅ iPhone 13 seriyasi
+        "iPhone 13 Pro Max", "iPhone 13 Pro", "iPhone 13", "iPhone 13 mini",
+        // ✅ iPhone 12 seriyasi
+        "iPhone 12 Pro Max", "iPhone 12 Pro", "iPhone 12", "iPhone 12 mini",
+        // ✅ iPhone 11 seriyasi
+        "iPhone 11 Pro Max", "iPhone 11 Pro", "iPhone 11",
+        // ✅ Oldingi Pro/X seriyalari
+        "iPhone XS Max", "iPhone XS", "iPhone XR", "iPhone X",
+        // ✅ Oldingi seriyalar va SE
+        "iPhone 8 Plus", "iPhone 8", "iPhone 7 Plus", "iPhone 7", "iPhone SE (3rd Gen)", "iPhone SE (2nd Gen)", "iPhone 6s Plus", "iPhone 6s"
+    ],
+
+    Samsung: [
+        // ✅ Galaxy S (Flagman)
+        "Galaxy S24 Ultra", "Galaxy S24+", "Galaxy S24",
+        "Galaxy S23 Ultra", "Galaxy S23+", "Galaxy S23", "Galaxy S23 FE",
+        "Galaxy S22 Ultra", "Galaxy S22+", "Galaxy S22",
+        "Galaxy S21 Ultra", "Galaxy S21+", "Galaxy S21", "Galaxy S21 FE",
+        // ✅ Galaxy Z (Buklanadigan)
+        "Galaxy Z Fold5", "Galaxy Z Flip5", "Galaxy Z Fold4", "Galaxy Z Flip4", "Galaxy Z Fold3", "Galaxy Z Flip3",
+        // ✅ Galaxy A (O'rta toifa)
+        "Galaxy A74", "Galaxy A55", "Galaxy A54", "Galaxy A53", "Galaxy A52s 5G",
+        "Galaxy A35", "Galaxy A34", "Galaxy A33", "Galaxy A25", "Galaxy A24",
+        "Galaxy A15", "Galaxy A14", "Galaxy A05s", "Galaxy A04s",
+        // ✅ Galaxy M (Onlayn bozor)
+        "Galaxy M54", "Galaxy M53", "Galaxy M34", "Galaxy M33", "Galaxy M14", "Galaxy M13",
+        // ✅ Note seriyasi
+        "Galaxy Note 20 Ultra", "Galaxy Note 20", "Galaxy Note 10+", "Galaxy Note 10"
+    ],
+
+    Xiaomi: [
+        // ✅ Xiaomi Flagman (Mi Seriya)
+        "Xiaomi 14 Ultra", "Xiaomi 14 Pro", "Xiaomi 14", "Xiaomi 13 Ultra", "Xiaomi 13 Pro", "Xiaomi 13",
+        "Xiaomi 12S Ultra", "Xiaomi 12 Pro", "Xiaomi 12", "Xiaomi 11 Ultra", "Xiaomi 11 Pro",
+        // ✅ Redmi Note (O'rta toifa)
+        "Redmi Note 13 Pro+", "Redmi Note 13 Pro", "Redmi Note 13",
+        "Redmi Note 12 Pro+", "Redmi Note 12 Pro", "Redmi Note 12", "Redmi Note 11 Pro+", "Redmi Note 11 Pro", "Redmi Note 11",
+        // ✅ Redmi (Boshlang'ich)
+        "Redmi 13C", "Redmi 12", "Redmi 10",
+        // ✅ POCO (Ishlashga yo'naltirilgan)
+        "Poco F5 Pro", "Poco F5", "Poco X6 Pro", "Poco X6", "Poco M6 Pro", "Poco M5s", "Poco C65"
+    ],
+
+    Huawei: [
+        // ✅ P Seriyasi (Flagman)
+        "P60 Pro", "P50 Pro", "P40 Pro+", "P40 Pro", "P30 Pro",
+        // ✅ Mate Seriyasi (Flagman)
+        "Mate 60 Pro", "Mate 50 Pro", "Mate 40 Pro",
+        // ✅ Nova Seriyasi (O'rta/Premium)
+        "Nova 12 SE", "Nova 11 Pro", "Nova 11", "Nova 10 Pro", "Nova 10", "Nova 9"
+    ],
+
+    Oppo: [
+        // ✅ Find X Seriyasi (Flagman)
+        "Find X7 Ultra", "Find X7", "Find X6 Pro", "Find X5 Pro",
+        // ✅ Reno Seriyasi (Premium O'rta toifa)
+        "Reno 11 Pro", "Reno 11", "Reno 10 Pro+", "Reno 10", "Reno 8 Pro",
+        // ✅ A Seriyasi (O'rta/Boshlang'ich)
+        "A98", "A79", "A78", "A58", "A38"
+    ],
+
+    Vivo: [
+        // ✅ X Seriyasi (Flagman)
+        "X100 Pro", "X100", "X90 Pro", "X90", "X80 Pro",
+        // ✅ V Seriyasi (O'rta/Premium)
+        "V30 Pro", "V29 Pro", "V29", "V27 Pro", "V27",
+        // ✅ Y Seriyasi (O'rta/Boshlang'ich)
+        "Y36", "Y35", "Y200", "Y100"
+    ],
+
+    Realme: [
+        // ✅ GT Seriyasi (Flagman)
+        "GT5 Pro", "GT Neo 5", "GT 3", "GT 2 Pro",
+        // ✅ Raqamli Seriya (Premium O'rta toifa)
+        "12 Pro+", "12 Pro", "11 Pro+", "11 Pro", "10 Pro+", "9 Pro+",
+        // ✅ C Seriyasi (Boshlang'ich)
+        "C67", "C55", "C53", "C33"
+    ],
+
+    Nokia: [
+        // ✅ X Seriyasi
+        "Nokia X30 5G", "Nokia X21 5G",
+        // ✅ G Seriyasi
+        "Nokia G60 5G", "Nokia G42 5G", "Nokia G21",
+        // ✅ C Seriyasi
+        "Nokia C32", "Nokia C22", "Nokia C21 Plus"
+    ],
+    
+    // ✅ Qo'shimcha Mashhur Brendlar
+    "Google Pixel": [
+        "Pixel 8 Pro", "Pixel 8", "Pixel 7 Pro", "Pixel 7", "Pixel 7a", "Pixel Fold", "Pixel 6 Pro", "Pixel 6"
+    ],
+    
+    "OnePlus": [
+        "OnePlus 12", "OnePlus 11", "OnePlus Open", "OnePlus Nord 3", "OnePlus Nord CE 3"
+    ]
     };
 
     const ISSUE_KB = [
@@ -360,22 +595,42 @@
     const histList = document.getElementById('historyList');
 
     // ——— Init brand list ———
-    function initBrands(){
-      brandEl.innerHTML = '<option value="" disabled '+(state.brand?'':'selected')+'>Masalan, Apple<\/option>' +
-        Object.keys(BRANDS).map(b=>`<option ${state.brand===b?'selected':''} value="${b}">${b}<\/option>`).join('');
-      brandEl.disabled = false;
-      updateModels();
+function initBrands(){
+    let opts = `<option value="">Brendni tanlang</option>`;
+    Object.keys(BRANDS).forEach(b=>{
+        opts += `<option value="${b}" ${state.brand===b?'selected':''}>${b}</option>`;
+    });
+    brandEl.innerHTML = opts;
+    brandEl.disabled = false;
+}
+
+
+
+function updateModels(){
+    const arr = BRANDS[state.brand] || [];
+    if(!arr.length){
+        modelEl.innerHTML = `<option value="">Avval brendni tanlang</option>`;
+        modelEl.disabled = true;
+        return;
     }
-    function updateModels(){
-      const arr = BRANDS[state.brand] || [];
-      modelEl.innerHTML = arr.length ? arr.map(m=>`<option ${state.model===m?'selected':''} value="${m}">${m}<\/option>`).join('')
-                                     : '<option selected>Avval brendni tanlang<\/option>';
-      modelEl.disabled = !arr.length;
-    }
-    brandEl.addEventListener('change', e=>{ state.brand = e.target.value; state.model=''; updateModels(); });
-    modelEl.addEventListener('change', e=>{ state.model = e.target.value; });
-    function resetBrandModel(){ state.brand=''; state.model=''; initBrands(); }
-    window.resetBrandModel = resetBrandModel;
+    let opts = `<option value="">Modelni tanlang</option>`;
+    arr.forEach(m=>{
+        opts += `<option value="${m}" ${state.model===m?'selected':''}>${m}</option>`;
+    });
+    modelEl.innerHTML = opts;
+    modelEl.disabled = false;
+}
+
+
+
+    brandEl.addEventListener('change', e=>{
+    state.brand = e.target.value;
+    state.model = '';
+    updateModels();
+    });
+    modelEl.addEventListener('change', e=>{
+    state.model = e.target.value;
+    });
 
     // ——— Suggestions as you type ———
     function renderSuggestions(){
@@ -388,38 +643,97 @@
     window.setIssue = setIssue;
     issueEl.addEventListener('input', e=>{ setIssue(e.target.value); });
 
-    // ——— Detailed AI renderer ———
-    function renderAIBlock(rule, ctx){
-      const { title, causes, actions, eta, price } = rule;
-      const header = `<div class="badge">Bo'lim: ${title}</div>`;
-      const summary = `<div class="glass"><h3 style="font-size:14px;margin-bottom:4px">Qisqa xulosa</h3><p>So'rovingiz: <b>${escapeHTML(ctx.query)}</b>. ${title} bo'yicha ehtimoliy nosozliklar topildi. Pastda bosqichma‑bosqich yo'riqnoma berildi.</p></div>`;
-      const causeList = `<div class="glass"><h3 style="font-size:14px;margin-bottom:4px">Ehtimoliy sabablar</h3><ul style="margin:0;padding-left:18px;color:var(--text);">${causes.map(c=>`<li>${c}<\/li>`).join('')}</ul></div>`;
-      const diag = `<div class="glass"><h3 style="font-size:14px;margin-bottom:4px">Uy sharoitida tekshiruv</h3><ol style="margin:0;padding-left:18px;color:var(--text);">${composeHomeChecks(rule.key).map(x=>`<li>${x}<\/li>`).join('')}</ol></div>`;
-      const fix = `<div class="glass"><h3 style="font-size:14px;margin-bottom:4px">Tavsiya etilgan yechim</h3><ul style="margin:0;padding-left:18px;color:var(--text);">${actions.map(a=>`<li>${a}<\/li>`).join('')}</ul></div>`;
-      const meta = `<div class="grid-2"><div class="badge">Vaqt: ${eta}</div><div class="badge">Narx: ${price}</div></div>`;
-      const safety = `<div class="glass"><h3 style=\"font-size:14px;margin-bottom:4px\">Ma'lumot xavfsizligi</h3><ul style=\"margin:0;padding-left:18px;color:var(--text);\"><li>Zaxira nusxa yarating (Google/ iCloud).</li><li>Namlik/ekran muammosida qurilmani ishlatishni cheklang.</li><li>Rasmiy zaryadlovchi va sifatli kabeldan foydalaning.</li></ul></div>`;
-      const promo = `<div class="glass" style="display:flex;align-items:center;justify-content:space-between;gap:8px;"><div><div style="font-weight:600">📣 Teleshop</div><p class="muted" style="margin-top:4px">Yangiliklar va aksiyalar</p></div><a class="btn primary" href="https://t.me/teleshopuz" target="_blank" rel="noopener">Obuna bo‘ling</a></div>`;
-      return [header, summary, causeList, diag, fix, meta, safety, promo].join('');
-    }
+// ——— Detailed AI renderer ———
+function renderAIBlock(rule, ctx){
+  const { title, causes, actions, eta, price } = rule;
+  const header = `<div class="badge">Bo'lim: ${title}</div>`;
+  const summary = `<div class="glass"><h3 style="font-size:14px;margin-bottom:4px">Qisqa xulosa</h3><p>So'rovingiz: <b>${escapeHTML(ctx.query)}</b>. ${title} bo'yicha ehtimoliy nosozliklar topildi. Pastda bosqichma‑bosqich yo'riqnoma berildi.</p></div>`;
+  const causeList = `<div class="glass"><h3 style="font-size:14px;margin-bottom:4px">Ehtimoliy sabablar</h3><ul style="margin:0;padding-left:18px;color:var(--text);">${causes.map(c=>`<li>${c}<\/li>`).join('')}</ul></div>`;
+  const diag = `<div class="glass"><h3 style="font-size:14px;margin-bottom:4px">Uy sharoitida tekshiruv</h3><ol style="margin:0;padding-left:18px;color:var(--text);">${composeHomeChecks(rule.key).map(x=>`<li>${x}<\/li>`).join('')}</ol></div>`;
+  const fix = `<div class="glass"><h3 style="font-size:14px;margin-bottom:4px">Tavsiya etilgan yechim</h3><ul style="margin:0;padding-left:18px;color:var(--text);">${actions.map(a=>`<li>${a}<\/li>`).join('')}</ul></div>`;
+  const meta = `<div class="grid-2"><div class="badge">Vaqt: ${eta}</div><div class="badge">Narx: ${price}</div></div>`;
+  const safety = `<div class="glass"><h3 style=\"font-size:14px;margin-bottom:4px\">Ma'lumot xavfsizligi</h3><ul style=\"margin:0;padding-left:18px;color:var(--text);\"><li>Zaxira nusxa yarating (Google/ iCloud/Kompyuter).</li><li>Namlik/ekran muammosida qurilmani ishlatishni cheklang va o'chiring.</li><li>Har doim rasmiy zaryadlovchi va sifatli kabeldan foydalaning.</li></ul></div>`;
+  const promo = `<div class="glass" style="display:flex;align-items:center;justify-content:space-between;gap:8px;"><div><div style="font-weight:600">📣 Teleshop</div><p class="muted" style="margin-top:4px">Yangiliklar va aksiyalar</p></div><a class="btn primary" href="https://t.me/teleshopuz" target="_blank" rel="noopener">Obuna bo‘ling</a></div>`;
+  return [header, summary, causeList, diag, fix, meta, safety, promo].join('');
+}
 
-    function composeHomeChecks(key){
-      switch(key){
-        case 'display':
-          return ["Qattiq himoya oynasini olib sinab ko'ring","Screenshotda chiziq ko'rinadimi tekshiring (ko'rinsa — soft, ko'rinmasa — hardware)","Sensor test ilovasi orqali multi‑touch tekshiruvi"];
-        case 'battery':
-          return ["Boshqa adapter/kabel bilan sinab ko'ring","Zaryad portini ehtiyotkorlik bilan tozalang","Batareya sog'ligini tekshiring (Android *AccuBattery*, iOS *Settings → Battery → Health*)"];
-        case 'water':
-          return ["Qurilmani o'chiring, zaryadga qo'ymang","SIM tray va portlarni quritishga urinmang (issiq fen yo'q)","Servisga tezda murojaat qiling — korroziya vaqt bilan kuchayadi"];
-        case 'camera':
-          return ["Kamerani boshqa ilovada sinab ko'ring","Kamera ilovasi keshini tozalang","Linza/qopqoqni tozalang"];
-        case 'network':
-          return ["Aviorejimni 30 soniyaga yoqib o'chiring","APN/Sozlamalarni standartga qaytaring","SIM kartani boshqa telefonda sinab ko'ring"];
-        case 'lag':
-          return ["So'nggi o'rnatilgan ilovalarni vaqtincha o'chiring","Bo'sh joyni 10–20% gacha oching","Tizim yangilanishini o'rnating","Qizish bo'lsa qopqoqsiz ishlatib ko'ring"];
-        default:
-          return ["Umumiy tekshiruv: qayta ishga tushiring, yangilanishlarni tekshiring, bo'sh joy qoldiring"];        
-      }
-    }
+function composeHomeChecks(key){
+  switch(key){
+    case 'display':
+      return [
+        "Qattiq himoya oynasini (zaschitniy steklo) olib sinab ko'ring",
+        "Screenshotda chiziq/nuqta ko'rinadimi tekshiring (ko'rinsa — dasturiy, ko'rinmasa — apparat buzilishi)",
+        "Sensor test ilovasi orqali multi‑touch va o'lik nuqtalarni tekshiruvi",
+        "Ekranni avtomatik yorqinligini o'chirib, statik yorqinlikda sinab ko'ring"
+      ];
+    case 'battery':
+      return [
+        "Boshqa original adapter/kabel bilan sinab ko'ring",
+        "Zaryad portini ehtiyotkorlik bilan tozalang (yog'och tish cho'p yordamida)",
+        "Batareya sog'ligini tekshiring (Android: *AccuBattery*, iOS: *Settings → Battery → Health*)",
+        "Keraksiz ilovalarni va fon jarayonlarini o'chirish orqali quvvat sarfini kuzating"
+      ];
+    case 'water':
+      return [
+        "Qurilmani **darhol** o'chiring va uni qayta yoqishga urinmang",
+        "Zaryadga **mutlaqo** qo'ymang",
+        "SIM tray va portlarni fen yordamida quritishga urinmang (issiq havo ichki qismlarni buzadi)",
+        "Servisga tezda murojaat qiling — korroziya vaqt o'tishi bilan kuchayadi va tiklab bo'lmas holga keltiradi"
+      ];
+    case 'camera':
+      return [
+        "Kamerani boshqa ilovada (masalan, Telegram kamerasida) sinab ko'ring",
+        "Kamera ilovasi ma'lumotlari va keshini tozalang (Sozlamalar → Ilovalar)",
+        "Linza/qopqoqni mikrofibra mato bilan tozalang",
+        "Old kamera ishlayotganini, lekin asosiy kamera ishlamayotganini tekshiring (aks holda apparat muammo ehtimoli yuqori)"
+      ];
+    case 'network':
+      return [
+        "Aviorejimni 30 soniyaga yoqib o'chiring",
+        "APN (Access Point Names) sozlamalarini standartga qaytaring (Sozlamalar → Mobil tarmoq → APN)",
+        "SIM kartani boshqa telefonda sinab ko'ring yoki boshqa SIM kartani o'zingizda sinab ko'ring",
+        "Tarmoq sozlamalarini qayta tiklash (Wi-Fi, mobil ma'lumotlar, Bluetooth)"
+      ];
+    case 'lag':
+      return [
+        "So'nggi o'rnatilgan ilovalarni vaqtincha o'chiring (ular xotirani to'ldirishi yoki konflikt berishi mumkin)",
+        "Bo'sh joyni 10–20% gacha oching (kamida 5GB bo'sh joy qoldiring)",
+        "Tizim yangilanishini o'rnating (ko'pincha optimalizatsiyalar kiritilgan bo'ladi)",
+        "Qizish bo'lsa, og'ir vazifalarni cheklab, himoya qopqoqsiz ishlatib ko'ring"
+      ];
+    case 'audio':
+      return [
+        "Quloqchinlarni ulab yoki uzib sinab ko'ring (audio karnay/port muammosini ajratish uchun)",
+        "Ovoz karnay (dinamik) va mikrofon teshiklarini ehtiyotkorlik bilan tozalang (chang to'planishi mumkin)",
+        "Maxfiy kodlar orqali diagnostika rejimida mikrofon va karnayni tekshiring (*#0*# Samsungda)"
+      ];
+    case 'buttons':
+      return [
+        "Himoya g'ilofi (chexol) sabab bo'layotganini tekshirish uchun uni olib sinab ko'ring",
+        "Tugmalar atrofidagi chang va kirni tekshiring",
+        "Qurilmani xavfsiz rejimda (Safe Mode) yuklab, tugmalar ishini tekshiring (Dasturiy konfliktni aniqlash uchun)"
+      ];
+    case 'software':
+      return [
+        "Kerakli barcha ma'lumotlaringizni zaxira nusxasini yarating (bu eng muhim qadam!)",
+        "Telefonni to'liq o'chirib, qayta yoqing (reboot)",
+        "Telefonni zavod sozlamalariga qaytarishga urinib ko'ring (oxirgi chora)"
+      ];
+    case 'storage':
+      return [
+        "Ilovalarning kesh xotirasini muntazam tozalang (Telegram, Browser, TikTok kabi)",
+        "Keraksiz katta fayllar (videolar, yuklamalar) va foto/videolarning bulutli zaxira nusxalarini tekshiring",
+        "SD-kartadan foydalansangiz, uni olib telefonda bo'sh joy qandayligini tekshiring (SD-kartada xato bo'lishi mumkin)"
+      ];
+    default:
+      return [
+        "Umumiy tekshiruv: telefonni qayta ishga tushiring (restart)",
+        "Tizim yangilanishlarini tekshiring va o'rnating",
+        "So'nggi o'rnatilgan ilovalarni tekshiring va keraksizlarini o'chiring",
+        "Zaxira nusxa yaratib, zavod sozlamalariga qaytarishni ko'rib chiqing (oxirgi chora)"
+      ];
+  }
+}
 
     function escapeHTML(str){ return (str||'').replace(/[&<>"']/g, s=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[s])); }
 
@@ -475,6 +789,15 @@
     }
     window.clearHistory = clearHistory;
 
+    function resetBrandModel(){
+        state.brand = '';
+        state.model = '';
+        initBrands();
+        updateModels();
+    }
+    window.resetBrandModel = resetBrandModel;
+
+
     function renderHistory(){
       if(!state.history.length){ histCard.classList.add('hidden'); return; }
       histCard.classList.remove('hidden');
@@ -497,15 +820,13 @@
       document.querySelectorAll('.tab').forEach(el=> el.classList.add('hidden'));
       document.querySelector(`section[data-tab="${key}"]`)?.classList.remove('hidden');
       document.querySelectorAll('.nav .btn').forEach(b=> b.classList.remove('active'));
+      document.querySelectorAll('.nav [data-nav]').forEach(b=> b.classList.remove('active'));
       document.querySelector(`.nav [data-nav="${key}"]`)?.classList.add('active');
+
       if(key==='home') renderHistory();
       window.scrollTo({top:0, behavior:'smooth'});
     }
     window.goTab = goTab;
-
-    // ——— Quick send ———
-    const pingBtn = document.getElementById('pingBtn');
-    pingBtn.addEventListener('click', ()=> sendQuick('ping'));
     function sendQuick(type){ try{ tg?.sendData?.(JSON.stringify({action:type, ts:Date.now()})); }catch(e){} }
 
     // ——— Boot ———
@@ -513,11 +834,13 @@
       const base = ["Qotib ishlayapti","Zaryad olmayapti","Ekran sinib qolgan","SIM ko'rmayapti","Wi‑Fi uzilib qoladi","Kamera xira"];
       suggWrap.innerHTML = base.map(s=>`<span class=\"chip\" onclick=\"setIssue('${s}')\">${s}<\/span>`).join('');
     }
-    (function boot(){
-      initBrands();
-      renderHistory();
-      renderSuggestionsBoot();
-    })();
+(function boot(){
+    initBrands();
+    updateModels();
+    renderHistory();
+    renderSuggestionsBoot();
+})();
+
   </script>
 </body>
 </html>
