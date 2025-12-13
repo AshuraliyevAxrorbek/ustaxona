@@ -1,846 +1,1655 @@
 <!DOCTYPE html>
 <html lang="uz">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Telefon Ustaxona — WebApp (Liquid Glass, Pro)</title>
-  <meta name="theme-color" content="#0f172a">
-  <style>
-    /* ————— Reset & base ————— */
-    *, *::before, *::after { box-sizing: border-box; }
-    html, body { height: 100%; }
-    body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji"; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teleshop Ustaxona</title>
 
-    /* ————— Theme (improved day/night contrast) ————— */
-    :root{
-      /* Night mode – deep, elegant, OLED-friendly */
-      --bg: #05070d;
-      --text: #e9eef7;
-      --muted: #9ba8b9;
-      --primary: #3b82f6;
-      --accent: #14b8a6;
-      --accent-2: #2dd4bf;
-      --warning: #f59e0b;
-      --danger: #f43f5e;
-      --glass: rgba(10,15,24,0.82);
-      --glass-2: rgba(10,15,24,0.6);
-      --ring: rgba(59,130,246,0.35);
-      --border: rgba(148,163,184,0.14);
-      --chip: rgba(148,163,184,0.16);
-      --chip-text: #e9eef7;
-    }
-/* ————— Theme (serious / pro palette, dark & light) ————— */
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
 
-    /* DARK (default) */
-    :root{
-    --bg: #0c1220;            /* deep navy */
-    --text: #e6edf3;          /* soft white */
-    --muted: #9aa8ba;         /* slate */
-    --primary: #1f6feb;       /* pro blue */
-    --accent: #2dd4bf;        /* teal */
-    --accent-2: #14b8a6;      /* stronger teal */
-    --warning: #f59e0b;       /* amber for notices */
-    --danger: #f43f5e;        /* rose */
-    --glass: rgba(20,26,38,0.78);
-    --glass-2: rgba(18,24,38,0.62);
-    --ring: rgba(31,111,235,0.35);
-    --border: rgba(148,163,184,0.16);
-    --chip: rgba(148,163,184,0.15);
-    --chip-text: #dbe2ea;
-    }
-
-    /* LIGHT (day mode) */
-    .light{
-    --bg: #f5f7fb;            /* bright soft white */
-    --text: #0f172a;
-    --muted: #475569;
-    --primary: #2563eb;
-    --accent: #0ea5a3;
-    --accent-2: #14b8a6;
-    --warning: #b45309;
-    --danger: #b91c1c;
-    --glass: rgba(255,255,255,0.78);
-    --glass-2: rgba(255,255,255,0.6);
-    --ring: rgba(37,99,235,0.2);
-    --border: rgba(15,23,42,0.12);
-    --chip: #e2e8f0;
-    --chip-text: #1e293b;
-    }
-
-    .light{
-      /* Light professional */
-      --bg: #f5f7fb;
-      --text: #0f172a;
-      --muted: #475569;
-      --primary: #2563eb;
-      --accent: #0ea5a3;
-      --accent-2: #14b8a6;
-      --warning: #b45309;
-      --danger: #b91c1c;
-      --glass: rgba(255,255,255,0.78);
-      --glass-2: rgba(255,255,255,0.6);
-      --ring: rgba(37,99,235,0.2);
-      --border: rgba(15,23,42,0.12);
-      --chip: #e2e8f0;
-      --chip-text: #1e293b;
-    }
-
-    /* ————— Liquid glass background (serious) ————— */
-/* --- Background wrapper (night default) --- */
-    .bg-wrap{
-    position: fixed; inset:0; overflow:hidden; z-index:-1;
-    background:
-        radial-gradient(60rem 60rem at 120% -10%, rgba(31,111,235,0.14), transparent 60%),
-        radial-gradient(40rem 40rem at -20% 10%, rgba(20,184,166,0.12), transparent 60%),
-        linear-gradient(180deg, #05070d, #0c1220 40%, #05070d 100%);
-    transition: background 0.6s ease, opacity 0.6s ease;
-    }
-
-    /* --- DAY MODE background with fade --- */
-    .light .bg-wrap{
-    background:
-        radial-gradient(55rem 55rem at 110% -8%, rgba(59,130,246,0.22), transparent 60%),
-        radial-gradient(42rem 42rem at -18% 12%, rgba(20,184,166,0.20), transparent 60%),
-        linear-gradient(180deg, #f8fafc, #e8edf6 50%, #f8fafc 100%);
-    transition: background 0.6s ease, opacity 0.6s ease;
-    }
-
-    .blob{ position:absolute; filter: blur(28px) saturate(130%); opacity:.5; mix-blend: screen; }
-    .blob.b1{ width: 38rem; height: 38rem; left:-12rem; top:-10rem; background: radial-gradient(circle at 30% 30%, rgba(31,111,235,0.32), transparent 60%); }
-    .blob.b2{ width: 34rem; height: 34rem; right:-10rem; top:-6rem; background: radial-gradient(circle at 70% 30%, rgba(20,184,166,0.30), transparent 60%); }
-    .blob.b3{ width: 44rem; height: 44rem; left:50%; bottom:-16rem; transform:translateX(-50%); background: radial-gradient(circle at 50% 50%, rgba(14,165,233,0.18), transparent 60%); }
-
-    /* ————— Layout ————— */
-    .container{ max-width: 460px; margin: 0 auto; padding: 14px; padding-bottom: 112px; min-height: 100dvh; }
-    .topbar{ position: sticky; top: 0; backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); background: color-mix(in srgb, var(--glass) 92%, transparent); border-bottom: 1px solid var(--border); z-index: 20; }
-    .topbar-inner{ max-width: 460px; margin: 0 auto; display:flex; align-items:center; justify-content:space-between; gap:10px; padding: 10px 12px; color: var(--text); }
-
-    /* ————— Glass cards ————— */
-    .glass{ background: linear-gradient(180deg, var(--glass), var(--glass-2)); border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(2,6,23,0.28); border-radius: 18px; padding: 14px; backdrop-filter: blur(16px) saturate(140%); -webkit-backdrop-filter: blur(16px) saturate(140%); }
-    .glass + .glass{ margin-top: 12px; }
-
-    h1,h2,h3{ color: var(--text); margin: 0 0 6px; }
-    p{ color: var(--muted); margin: 0 0 10px; }
-
-    /* ————— Controls ————— */
-    .btn{ display:inline-flex; align-items:center; justify-content:center; gap:8px; border:1px solid var(--border); background:#fff0; color: var(--text); padding: 10px 14px; border-radius: 14px; cursor:pointer; transition: transform .06s ease, background .2s ease, border-color .2s ease; text-decoration:none; }
-    .btn:active{ transform: translateY(1px) }
-    .btn.primary{ background: linear-gradient(135deg, var(--primary), var(--accent)); color: white; border-color: transparent; }
-    .btn.ghost{ background: transparent; }
-    .btn.block{ width: 100%; }
-
-.input,
-.select,
-textarea{
-  width: 100%;
-  padding: 12px 14px;
-  border-radius: 12px;
-  font-size: 14px;
-  border: 1px solid var(--border);
-
-  /* Blurni olib tashlaymiz — chunki iOS/Safari/Telegram WebView dropdownni o‘chirmaydi */
-  background: rgba(255,255,255,0.92);
-  -webkit-backdrop-filter: none !important;
-  backdrop-filter: none !important;
-
-  color: var(--text);
-  outline: none;
-  appearance: none;
-  -webkit-appearance: none;
-  pointer-events: auto !important;
-  position: relative;
-  z-index: 9999; /* dropdown ustida chiqadi */
+<style>
+/* ===========================================
+   THEME VARIABLES
+=========================================== */
+:root {
+  --blue:#0088cc;
+  --lightblue:#46c3ff;
+  --bg:#eef6ff;
+  --glass:rgba(255,255,255,0.62);
+  --card:rgba(255,255,255,0.8);
+  --text:#111;
+  --text-soft:#666;
+  --border:rgba(255,255,255,0.25);
+  --shadow:0 8px 24px rgba(0,0,0,0.15);
+}
+[data-theme="dark"] {
+  --bg:#0e0e0e;
+  --glass:rgba(30,30,30,0.55);
+  --card:rgba(40,40,40,0.75);
+  --text:#fff;
+  --text-soft:#aaa;
+  --border:rgba(255,255,255,0.1);
+  --shadow:0 8px 28px rgba(0,0,0,0.7);
 }
 
-/* DARK MODE uchun background o‘zgartiramiz */
-:root .input,
-:root .select,
-:root textarea {
-  background: rgba(15,23,42,0.85);
-  color: var(--text);
+/* ===========================================
+   GLOBAL STYLE
+=========================================== */
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  background:var(--bg);
+  font-family:"Outfit",sans-serif;
+  padding:20px;
+  color:var(--text);
+  transition:.35s;
+}
+.container{
+  max-width:600px;
+  margin:auto;
 }
 
-/* LIGHT MODE uchun */
-.light .input,
-.light .select,
-.light textarea {
-  background: rgba(255,255,255,0.92);
-  color: #0f172a;
+/* ===========================================
+   ANIMATIONS
+=========================================== */
+@keyframes fadeUp {
+  from {opacity:0;transform:translateY(18px);}
+  to {opacity:1;transform:translateY(0);}
 }
 
-/* FOCUS effekti */
-.input:focus,
-.select:focus,
-textarea:focus{
-  border-color: transparent;
-  box-shadow: 0 0 0 6px var(--ring);
-}
-
-/* Placeholder rangi */
-.input::placeholder,
-textarea::placeholder {
-  color: var(--muted);
-  opacity: .9;
-}
-
-/* Row */
-.row{
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 10px;
-}
-
-/* Labels */
-label{
-  font-size: 12px;
-  color: var(--muted);
-  margin-bottom: 4px;
-  display: block;
-}
-
-/* Suggestions / Chips */
-.chips{ 
-  display:flex; 
-  flex-wrap: wrap; 
-  gap: 8px; 
-}
-.chip{
-  padding: 6px 10px;
-  border-radius: 999px;
-  background: var(--chip);
-  color: var(--chip-text);
-  cursor: pointer;
-  border: 1px solid var(--border);
-  font-size: 12px;
-}
-
-/* Grid helpers */
-.grid-3{ display:grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
-.grid-2{ display:grid; grid-template-columns: repeat(2,1fr); gap: 8px; }
-
-    /* ————— Footer nav ————— */
-
-.tab{
-  opacity:1;
-  transform:translateY(0);
-  transition: opacity .35s ease, transform .35s ease;
-}
-.tab.hidden{
-  opacity:0;
-  transform:translateY(14px);
-  pointer-events:none;
-}
-
-/* --- Navbar Liquid Glass (iPhone style) --- */
-.footer{
-  position: fixed;
-  left:0; right:0; bottom: 26px;
-  z-index: 50;
-}
-.footer-inner{
-  margin: 0 auto;
-  max-width: 460px;
-  padding: 6px;
-}
-
-.nav{
-  display:grid;
-  grid-template-columns: repeat(4,1fr);
-  gap:8px;
-
-  /* Liquid glass */
-  background: color-mix(in srgb, var(--glass) 78%, transparent);
-  border: 1px solid var(--border);
-  border-radius: 32px;              /* iPhone pill */
-  padding: 10px 10px;
-  box-shadow: 0 20px 48px rgba(0,0,0,0.42);
-
-  backdrop-filter: blur(26px) saturate(180%) brightness(1.15);
-  -webkit-backdrop-filter: blur(26px) saturate(180%) brightness(1.15);
-
-  transition: background .45s ease, backdrop-filter .45s ease;
-}
-
-/* Large buttons */
-.nav button, .nav a{
-  padding: 10px 0;
-  border-radius: 22px;              /* rounder */
-  font-size: 12px;
+/* ===========================================
+   HEADER
+=========================================== */
+.header{
   display:flex;
-  flex-direction:column;
-  gap:2px;
+  justify-content:space-between;
   align-items:center;
-  color: var(--text);
-  transition: background .25s ease, color .2s ease;
+  background:var(--glass);
+  border-radius:22px;
+  padding:18px;
+  backdrop-filter:blur(20px);
+  border:1px solid var(--border);
+  box-shadow:var(--shadow);
+  animation:fadeUp .6s ease;
 }
-
-.nav .active{
-  background: linear-gradient(135deg, var(--primary), var(--accent));
+.header .left{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.logo{
+  font-size:20px;
+  padding:12px;
+  border-radius:14px;
+  background:linear-gradient(135deg,var(--blue),var(--lightblue));
   color:#fff;
-  border-color:transparent;
-  box-shadow:0 0 12px rgba(37,99,235,0.45);
+  box-shadow:0 4px 15px rgba(0,136,204,0.4);
+}
+.header h1{
+  font-size:22px;
+  font-weight:700;
+  background:linear-gradient(135deg,var(--blue),var(--lightblue));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+.theme-btn{
+  width:45px;height:45px;
+  border-radius:50%;
+  border:none;
+  background:var(--glass);
+  color:var(--text);
+  backdrop-filter:blur(8px);
+  font-size:20px;
+  cursor:pointer;
+  border:1px solid var(--border);
 }
 
-/* Light mode pill */
-.light .nav{
-  background: rgba(255,255,255,0.55);
-  box-shadow: 0 20px 48px rgba(0,0,0,0.18);
-  backdrop-filter: blur(26px) saturate(180%) brightness(1.35);
+/* ===========================================
+   TABS
+=========================================== */
+.tabs{
+  margin-top:20px;
+  display:flex;
+  gap:10px;
+  background:var(--glass);
+  padding:8px;
+  border-radius:18px;
+  border:1px solid var(--border);
+  backdrop-filter:blur(16px);
+  box-shadow:var(--shadow);
+  animation:fadeUp .8s ease;
 }
-    /* ————— Helpers ————— */
-    .hidden{ display:none !important; }
-    .muted{ color: var(--muted); }
-    .badge{ background: color-mix(in srgb, var(--glass) 70%, transparent); color: var(--text); border:1px solid var(--border); padding: 6px 10px; border-radius: 999px; font-size: 12px; }
-  </style>
+.tab{
+  flex:1;
+  padding:12px;
+  border:none;
+  background:transparent;
+  border-radius:14px;
+  font-weight:600;
+  cursor:pointer;
+  color:var(--text);
+  transition:.25s;
+}
+.tab.active{
+  background:linear-gradient(135deg,var(--blue),var(--lightblue));
+  color:#fff;
+  box-shadow:0 4px 14px rgba(0,136,204,0.35);
+}
+
+/* ===========================================
+   PAGES
+=========================================== */
+.page{display:none;animation:fadeUp .6s ease;}
+.page.active{display:block;}
+
+/* ===========================================
+   INPUT CARD
+=========================================== */
+.input-card{
+  background:var(--card);
+  padding:20px;
+  border-radius:20px;
+  border:1px solid var(--border);
+  box-shadow:var(--shadow);
+  backdrop-filter:blur(18px);
+  margin-top:20px;
+}
+textarea{
+  width:100%;
+  height:120px;
+  margin-top:10px;
+  padding:14px;
+  border-radius:14px;
+  border:2px solid rgba(0,0,0,0.1);
+  background:rgba(255,255,255,0.5);
+  resize:none;
+  outline:none;
+  font-size:16px;
+}
+textarea:focus{
+  border-color:var(--blue);
+  box-shadow:0 0 0 4px rgba(0,136,204,0.15);
+}
+
+.btn{
+  margin-top:14px;
+  width:100%;
+  padding:16px;
+  font-size:16px;
+  background:linear-gradient(135deg,var(--blue),var(--lightblue));
+  border:none;
+  border-radius:14px;
+  color:#fff;
+  font-weight:600;
+  cursor:pointer;
+  box-shadow:0 6px 18px rgba(0,136,204,0.3);
+}
+
+/* ===========================================
+   RESULT / GUIDE CARDS
+=========================================== */
+.result-card, .guide-card{
+  background:var(--card);
+  padding:20px;
+  border-radius:20px;
+  margin-top:15px;
+  border:1px solid var(--border);
+  box-shadow:var(--shadow);
+  animation:fadeUp .6s ease;
+}
+.result-title, .guide-title{
+  font-size:18px;
+  font-weight:700;
+  background:linear-gradient(135deg,var(--blue),var(--lightblue));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+.result-text, .guide-desc{
+  margin-top:10px;
+  font-size:15px;
+  color:var(--text-soft);
+  line-height:1.6;
+}
+
+.footer{
+  margin-top:40px;
+  text-align:center;
+  color:var(--text-soft);
+  font-size:14px;
+}
+</style>
 </head>
+
 <body>
-  <div class="bg-wrap">
-    <div class="blob b1"></div>
-    <div class="blob b2"></div>
-    <div class="blob b3"></div>
+
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="left">
+      <div class="logo">🔧</div>
+      <h1>Ustaxona</h1>
+    </div>
+    <button class="theme-btn" id="themeBtn" onclick="toggleTheme()">🌙</button>
   </div>
 
-  <!-- Topbar -->
-  <div class="topbar">
-    <div class="topbar-inner">
-      <div style="display:flex;align-items:center;gap:10px;">
-        <div style="padding:8px;border-radius:12px;background:linear-gradient(135deg,var(--primary),var(--accent)); color:#fff;">🛠️</div>
-        <div>
-          <div style="font-weight:700;line-height:1">Telefon Ustaxona</div>
-          <div class="muted" style="font-size:11px;line-height:1">Liquid glass • Pro UI • AI</div>
-        </div>
-      </div>
-      <div style="display:flex;gap:8px;">
-        <a class="btn ghost" href="https://t.me/teleshopuz" target="_blank" rel="noopener">Teleshop</a>
-        <button id="themeBtn" class="btn ghost" title="Tun/Tong">🌗</button>
-      </div>
-    </div>
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('diagnose',event)">🛠 Diagnostika</button>
+    <button class="tab" onclick="switchTab('guide',event)">📘 Qo‘llanma</button>
+    <button class="tab" onclick="switchTab('care',event)">💡 Parvarish</button>
   </div>
 
-  <!-- Main container -->
-  <div class="container">
+  <!-- PAGE — DIAGNOSE -->
+  <div class="page active" id="diagnose-page">
 
-    <!-- HOME TAB -->
-    <section data-tab="home" class="tab glass">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-        <div style="padding:10px;border-radius:16px;background:linear-gradient(135deg,var(--accent),var(--primary)); color:#fff;">📱</div>
-        <div>
-          <h2 style="margin:0">Telefon Ustaxona</h2>
-          <p class="muted" style="margin-top:2px">Professional servis. Aniq diagnoz. Tez yordam.</p>
-        </div>
-      </div>
-      <p>Qurilmangizni tanlang va muammoni yozing — AI batafsil tahlil va bosqichma‑bosqich tavsiya beradi.</p>
-      <div class="grid-2" style="margin-top:12px;">
-        <button class="btn primary" onclick="goTab('brand')">Brend/Model</button>
-        <button class="btn" onclick="goTab('ai')">AI tahlil</button>
-      </div>
-      <div class="glass" style="margin-top:12px; display:flex; align-items:center; justify-content:space-between; gap:8px;">
-        <div>
-          <div style="font-weight:600">📣 Teleshop kanali</div>
-          <div class="muted" style="font-size:12px">Yangiliklar, aksiyalar va maslahatlar</div>
-        </div>
-        <a class="btn primary" href="https://t.me/teleshopuz" target="_blank" rel="noopener">Obuna bo‘lish</a>
-      </div>
-    </section>
+    <div class="input-card">
+      <label>Muammoingizni yozing yoki ayting:</label>
+      <textarea id="problemInput" placeholder="Masalan: Telefon qizib ketmoqda, ekran singan, ilova ochilmayapti ..."></textarea>
 
-    <div class="glass" style="margin-top:12px">
-    <div class="grid-3">
-        <button class="btn" onclick="goTab('brand')">🏷️ Brend</button>
-        <button class="btn" onclick="goTab('ai')">🤖 AI</button>
-        <a class="btn" href="https://t.me/teleshopuz" target="_blank">📣 Teleshop</a>
-    </div>
+      <button class="btn" onclick="startSpeech()">🎤 Ovoz orqali aytish</button>
+      <button class="btn" onclick="diagnose()">🔍 Tahlil qilish</button>
     </div>
 
+    <div id="resultBox"></div>
 
-
-    <section id="historyCard" class="glass hidden">
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-        <div>
-          <h3>AI so'rovlar tarixi</h3>
-          <p class="muted">Oxirgi 10 ta</p>
-        </div>
-        <button class="btn" onclick="clearHistory()">🧹 Tozalash</button>
-      </div>
-      <div id="historyList" style="display:grid;gap:8px;margin-top:8px;"></div>
-    </section>
-
-    <!-- BRAND/MODEL TAB -->
-    <section data-tab="brand" class="tab glass hidden">
-        <h3>Qurilmangizni tanlang</h3>
-        <p class="muted">Brend va modelni belgilang.</p>
-
-        <div class="row" style="margin-top:8px;">
-            <div>
-            <label for="brand">Brend</label>
-            <select id="brand" class="select"></select>
-            </div>
-
-            <div>
-            <label for="model">Model</label>
-            <select id="model" class="select" disabled></select>
-            </div>
-
-            <div class="grid-2">
-            <button class="btn primary" onclick="goTab('ai')">AIga o'tish →</button>
-            <button class="btn" onclick="resetBrandModel()">Tozalash</button>
-            </div>
-        </div>
-    </section>
-
-    <!-- AI TAB -->
-    <section data-tab="ai" class="tab glass hidden">
-      <h3>AI Diagnoz</h3>
-      <p class="muted">Muammoni yozing. AI batafsil <b>(sabablar → tekshiruv → yechim → profilaktika)</b> formati bilan javob beradi.</p>
-      <div class="row">
-        <div>
-          <label>Qisqacha muammo (uz/ru)</label>
-          <input id="issue" class="input" placeholder="Masalan: qotib ishlayapti, zaryad olmayapti, ekran sinib qolgan" />
-        </div>
-        <div id="suggestions" class="chips"></div>
-        <div class="grid-2">
-          <button id="aiBtn" class="btn primary">AI tahlil</button>
-          <button class="btn" onclick="setIssue('')">Tozalash</button>
-        </div>
-        <div class="glass hidden" id="aiResultWrap" style="margin-top:2px;">
-          <h3 style="font-size:16px">🤖 AI natijasi</h3>
-          <div id="aiResult" style="margin-top:8px"></div>
-          <div class="badge" style="margin-top:10px" id="aiHint">Yakuniy diagnoz ustada tasdiqlanadi. Muhim ma'lumotlarni zaxiralashni unutmang.</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- HELP TAB -->
-    <section data-tab="help" class="tab glass hidden">
-      <h3>Ma'lumot</h3>
-      <p class="muted">Buyurtma sahifasi yo‘q — faqat AI va brend/model tanlash. Teleshop kanali reklama tugmasi qo‘shildi.</p>
-      <div class="row" style="margin-top:8px;">
-        <div class="badge">Liquid glass UI</div>
-        <div class="badge">Kuchli blur</div>
-        <div class="badge">Pro rang palitrasi</div>
-        <div class="badge">AI batafsil javob</div>
-      </div>
-      <div class="glass" style="margin-top:10px;display:flex;align-items:center;justify-content:space-between;gap:8px;">
-        <div>
-          <div style="font-weight:600">📣 Teleshop kanali</div>
-          <p class="muted" style="margin-top:4px">Yangiliklar, aksiyalar, chegirmalar</p>
-        </div>
-        <a class="btn primary" href="https://t.me/teleshopuz" target="_blank" rel="noopener">Obuna bo‘ling</a>
-      </div>
-    </section>
   </div>
 
-  <!-- Footer nav -->
-  <div class="footer">
-    <div class="footer-inner">
-      <div class="nav">
-        <button data-nav="home" class="btn active" onclick="goTab('home')">🏠<span>Asosiy</span></button>
-        <button data-nav="brand" class="btn" onclick="goTab('brand')">🏷️<span>Brend</span></button>
-        <button data-nav="ai" class="btn" onclick="goTab('ai')">🤖<span>AI</span></button>
-        <button data-nav="help" class="btn" onclick="goTab('help')">ℹ️<span>Yordam</span></button>
-      </div>
-    </div>
-  </div>
+  <!-- PAGE — GUIDE -->
+  <div class="page" id="guide-page"></div>
 
-  <script>
-    // ——— Telegram WebApp integration ———
-    const tg = window?.Telegram?.WebApp || null;
-    try { tg?.ready(); tg?.expand(); } catch(e){}
+  <!-- PAGE — CARE -->
+  <div class="page" id="care-page"></div>
 
-    // ——— Theme toggle ———
-    const themeBtn = document.getElementById('themeBtn');
-    const prefers = localStorage.getItem('ux_theme') || (tg?.themeParams?.bg_color ? 'dark' : 'light');
-    if(prefers==='light') document.documentElement.classList.add('light');
-    themeBtn?.addEventListener('click', ()=>{
-      document.documentElement.classList.toggle('light');
-      const isLight = document.documentElement.classList.contains('light');
-      localStorage.setItem('ux_theme', isLight ? 'light' : 'dark');
-    });
+  <div class="footer">💙 Teleshop Ustaxona — 2026</div>
 
-    // ——— State ———
-    const state = { brand:'', model:'', issue:'', history: JSON.parse(localStorage.getItem('tx_history')||'[]') };
+</div>
 
-    // ——— Data ———
-    const BRANDS = {
-    Apple: [
-        // ✅ iPhone 15 seriyasi
-        "iPhone 15 Pro Max", "iPhone 15 Pro", "iPhone 15 Plus", "iPhone 15",
-        // ✅ iPhone 14 seriyasi
-        "iPhone 14 Pro Max", "iPhone 14 Pro", "iPhone 14 Plus", "iPhone 14",
-        // ✅ iPhone 13 seriyasi
-        "iPhone 13 Pro Max", "iPhone 13 Pro", "iPhone 13", "iPhone 13 mini",
-        // ✅ iPhone 12 seriyasi
-        "iPhone 12 Pro Max", "iPhone 12 Pro", "iPhone 12", "iPhone 12 mini",
-        // ✅ iPhone 11 seriyasi
-        "iPhone 11 Pro Max", "iPhone 11 Pro", "iPhone 11",
-        // ✅ Oldingi Pro/X seriyalari
-        "iPhone XS Max", "iPhone XS", "iPhone XR", "iPhone X",
-        // ✅ Oldingi seriyalar va SE
-        "iPhone 8 Plus", "iPhone 8", "iPhone 7 Plus", "iPhone 7", "iPhone SE (3rd Gen)", "iPhone SE (2nd Gen)", "iPhone 6s Plus", "iPhone 6s"
-    ],
-
-    Samsung: [
-        // ✅ Galaxy S (Flagman)
-        "Galaxy S24 Ultra", "Galaxy S24+", "Galaxy S24",
-        "Galaxy S23 Ultra", "Galaxy S23+", "Galaxy S23", "Galaxy S23 FE",
-        "Galaxy S22 Ultra", "Galaxy S22+", "Galaxy S22",
-        "Galaxy S21 Ultra", "Galaxy S21+", "Galaxy S21", "Galaxy S21 FE",
-        // ✅ Galaxy Z (Buklanadigan)
-        "Galaxy Z Fold5", "Galaxy Z Flip5", "Galaxy Z Fold4", "Galaxy Z Flip4", "Galaxy Z Fold3", "Galaxy Z Flip3",
-        // ✅ Galaxy A (O'rta toifa)
-        "Galaxy A74", "Galaxy A55", "Galaxy A54", "Galaxy A53", "Galaxy A52s 5G",
-        "Galaxy A35", "Galaxy A34", "Galaxy A33", "Galaxy A25", "Galaxy A24",
-        "Galaxy A15", "Galaxy A14", "Galaxy A05s", "Galaxy A04s",
-        // ✅ Galaxy M (Onlayn bozor)
-        "Galaxy M54", "Galaxy M53", "Galaxy M34", "Galaxy M33", "Galaxy M14", "Galaxy M13",
-        // ✅ Note seriyasi
-        "Galaxy Note 20 Ultra", "Galaxy Note 20", "Galaxy Note 10+", "Galaxy Note 10"
-    ],
-
-    Xiaomi: [
-        // ✅ Xiaomi Flagman (Mi Seriya)
-        "Xiaomi 14 Ultra", "Xiaomi 14 Pro", "Xiaomi 14", "Xiaomi 13 Ultra", "Xiaomi 13 Pro", "Xiaomi 13",
-        "Xiaomi 12S Ultra", "Xiaomi 12 Pro", "Xiaomi 12", "Xiaomi 11 Ultra", "Xiaomi 11 Pro",
-        // ✅ Redmi Note (O'rta toifa)
-        "Redmi Note 13 Pro+", "Redmi Note 13 Pro", "Redmi Note 13",
-        "Redmi Note 12 Pro+", "Redmi Note 12 Pro", "Redmi Note 12", "Redmi Note 11 Pro+", "Redmi Note 11 Pro", "Redmi Note 11",
-        // ✅ Redmi (Boshlang'ich)
-        "Redmi 13C", "Redmi 12", "Redmi 10",
-        // ✅ POCO (Ishlashga yo'naltirilgan)
-        "Poco F5 Pro", "Poco F5", "Poco X6 Pro", "Poco X6", "Poco M6 Pro", "Poco M5s", "Poco C65"
-    ],
-
-    Huawei: [
-        // ✅ P Seriyasi (Flagman)
-        "P60 Pro", "P50 Pro", "P40 Pro+", "P40 Pro", "P30 Pro",
-        // ✅ Mate Seriyasi (Flagman)
-        "Mate 60 Pro", "Mate 50 Pro", "Mate 40 Pro",
-        // ✅ Nova Seriyasi (O'rta/Premium)
-        "Nova 12 SE", "Nova 11 Pro", "Nova 11", "Nova 10 Pro", "Nova 10", "Nova 9"
-    ],
-
-    Oppo: [
-        // ✅ Find X Seriyasi (Flagman)
-        "Find X7 Ultra", "Find X7", "Find X6 Pro", "Find X5 Pro",
-        // ✅ Reno Seriyasi (Premium O'rta toifa)
-        "Reno 11 Pro", "Reno 11", "Reno 10 Pro+", "Reno 10", "Reno 8 Pro",
-        // ✅ A Seriyasi (O'rta/Boshlang'ich)
-        "A98", "A79", "A78", "A58", "A38"
-    ],
-
-    Vivo: [
-        // ✅ X Seriyasi (Flagman)
-        "X100 Pro", "X100", "X90 Pro", "X90", "X80 Pro",
-        // ✅ V Seriyasi (O'rta/Premium)
-        "V30 Pro", "V29 Pro", "V29", "V27 Pro", "V27",
-        // ✅ Y Seriyasi (O'rta/Boshlang'ich)
-        "Y36", "Y35", "Y200", "Y100"
-    ],
-
-    Realme: [
-        // ✅ GT Seriyasi (Flagman)
-        "GT5 Pro", "GT Neo 5", "GT 3", "GT 2 Pro",
-        // ✅ Raqamli Seriya (Premium O'rta toifa)
-        "12 Pro+", "12 Pro", "11 Pro+", "11 Pro", "10 Pro+", "9 Pro+",
-        // ✅ C Seriyasi (Boshlang'ich)
-        "C67", "C55", "C53", "C33"
-    ],
-
-    Nokia: [
-        // ✅ X Seriyasi
-        "Nokia X30 5G", "Nokia X21 5G",
-        // ✅ G Seriyasi
-        "Nokia G60 5G", "Nokia G42 5G", "Nokia G21",
-        // ✅ C Seriyasi
-        "Nokia C32", "Nokia C22", "Nokia C21 Plus"
-    ],
-    
-    // ✅ Qo'shimcha Mashhur Brendlar
-    "Google Pixel": [
-        "Pixel 8 Pro", "Pixel 8", "Pixel 7 Pro", "Pixel 7", "Pixel 7a", "Pixel Fold", "Pixel 6 Pro", "Pixel 6"
-    ],
-    
-    "OnePlus": [
-        "OnePlus 12", "OnePlus 11", "OnePlus Open", "OnePlus Nord 3", "OnePlus Nord CE 3"
-    ]
-    };
-
-    const ISSUE_KB = [
-      { tag:'Ekran', hints:["Ekran sinib qolgan","Sensor ishlamayapti","Chiziqlar paydo bo'lgan","Nur so'nishi"] },
-      { tag:'Batareya', hints:["Tez zaryad tugaydi","Zaryad olmyapti","Qizib ketadi","% sakrab ketadi"] },
-      { tag:'Suv', hints:["Suv tushib ketdi","Mikrofon past","Dinamik jim"] },
-      { tag:'Kamera', hints:["Orqa kamera xira","Old kamera ochilmaydi","Qora ekran"] },
-      { tag:'Tarmoq', hints:["SIM ko'rmayapti","Wi‑Fi uzilib qoladi","IMEI yo'q"] },
-      { tag:'Ishlash', hints:["Qotib ishlayapti","Sekinlashib ketdi","O'zi o'chib qoladi","Restart bo'ladi"] },
-    ];
-
-    // ——— Expanded AI rules ———
-    const AI_RULES = [
-      { key:'display', pattern: /(ekran|sensor|display|sin|chiziq)/i, title:"Ekran/Touch", causes:["Sensor shikasti","OLED/LCD nosozligi","Shleyf/konnektor bo'shashi","Yiqilishdan keyingi ichki zarba"], actions:["Modul tekshiruvi","Sensor/OLED test","Shleyfni qayta ulash","Modul/almashtirish"], eta:"1–2 soat", price:"indikativ" },
-      { key:'battery', pattern: /(batareya|zaryad|quvvat|%|tez tugaydi|port)/i, title:"Batareya/Zaryad", causes:["Batareya eskirgan","Zaryad porti changlangan","Adapter/kabel muammosi","Background ilovalar ko'pligi"], actions:["Battery health test","Portni tozalash","Original adapter bilan tekshirish","Batareyani almashtirish"], eta:"30–60 daqiqa", price:"indikativ" },
-      { key:'water', pattern: /(suv|namlik|ho'l|nam)/i, title:"Namlik", causes:["Korroziya","Qisqa tutashuv","Dinamik/Mikrofon namlanishi"], actions:["To'liq tozalash va quritish","Kontaktlarni reanimatsiya","Zararlangan modulni almashtirish"], eta:"2–4 soat", price:"indikativ" },
-      { key:'camera', pattern: /(kamera|selfi|orqa|video)/i, title:"Kamera", causes:["Modul shikasti","Shisha qopqoq chizilgan","Dasturiy xato"], actions:["Modul test","Shisha/Modul almashtirish","Kamera ilovasi ma'lumotlarini tozalash"], eta:"1–2 soat", price:"indikativ" },
-      { key:'network', pattern: /(tarmoq|sim|imei|wifi|wi-?fi|signal)/i, title:"Tarmoq", causes:["Antenna uzuqligi","Baseband nosozligi","Operator muammosi"], actions:["Baseband testi","Antenna ulash/IC ishlari","APN/Sozlamalarni tiklash"], eta:"2–6 soat", price:"indikativ" },
-      { key:'lag', pattern: /(qotib|qotadi|qotib ishlayapti|sekin|lag|o'chib|ochmayapti|restart|hanging|freeze)/i, title:"Ishlash/Sezilarli sekinlashuv", causes:["Xotira to'lib ketgan","Kesh va vaqtinchalik fayllar","Ilova konfliktlari","Qizish/termal throttling","Dasturiy (OS) buzilish"], actions:["Xotirani bo'shatish (10–20%)","Keshni tozalash","So'nggi o'rnatilgan ilovalarni olib tashlash","Tizimni yangilash yoki qayta yozish","Sovutish tizimini tekshirish"], eta:"30–90 daqiqa", price:"indikativ" },
-    ];
-
-    // ——— Elements ———
-    const brandEl = document.getElementById('brand');
-    const modelEl = document.getElementById('model');
-    const issueEl = document.getElementById('issue');
-    const suggWrap = document.getElementById('suggestions');
-    const aiBtn = document.getElementById('aiBtn');
-    const aiWrap = document.getElementById('aiResultWrap');
-    const aiRes = document.getElementById('aiResult');
-    const histCard = document.getElementById('historyCard');
-    const histList = document.getElementById('historyList');
-
-    // ——— Init brand list ———
-function initBrands(){
-    let opts = `<option value="">Brendni tanlang</option>`;
-    Object.keys(BRANDS).forEach(b=>{
-        opts += `<option value="${b}" ${state.brand===b?'selected':''}>${b}</option>`;
-    });
-    brandEl.innerHTML = opts;
-    brandEl.disabled = false;
+<script>
+/* ===========================================
+   THEME SWITCH
+=========================================== */
+function toggleTheme(){
+  let theme=document.documentElement.getAttribute("data-theme");
+  let newTheme=theme==="dark"?"light":"dark";
+  document.documentElement.setAttribute("data-theme",newTheme);
+  document.getElementById("themeBtn").textContent=newTheme==="dark"?"☀️":"🌙";
 }
 
+/* ===========================================
+   TAB SWITCH
+=========================================== */
+function switchTab(tab,e){
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+  e.target.classList.add("active");
 
-
-function updateModels(){
-    const arr = BRANDS[state.brand] || [];
-    if(!arr.length){
-        modelEl.innerHTML = `<option value="">Avval brendni tanlang</option>`;
-        modelEl.disabled = true;
-        return;
-    }
-    let opts = `<option value="">Modelni tanlang</option>`;
-    arr.forEach(m=>{
-        opts += `<option value="${m}" ${state.model===m?'selected':''}>${m}</option>`;
-    });
-    modelEl.innerHTML = opts;
-    modelEl.disabled = false;
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.getElementById(tab+"-page").classList.add("active");
 }
 
-
-
-    brandEl.addEventListener('change', e=>{
-    state.brand = e.target.value;
-    state.model = '';
-    updateModels();
-    });
-    modelEl.addEventListener('change', e=>{
-    state.model = e.target.value;
-    });
-
-    // ——— Suggestions as you type ———
-    function renderSuggestions(){
-      const q = (state.issue||'').toLowerCase();
-      const items = [];
-      ISSUE_KB.forEach(b=> b.hints.forEach(h=>{ if(h.toLowerCase().includes(q) && !items.includes(h)) items.push(h); }));
-      suggWrap.innerHTML = items.slice(0,8).map(s=>`<span class="chip" onclick="setIssue('${s.replace(/'/g,"&#39;")}')">${s}<\/span>`).join('');
-    }
-    function setIssue(v){ state.issue = v; issueEl.value = v; renderSuggestions(); aiWrap.classList.add('hidden'); }
-    window.setIssue = setIssue;
-    issueEl.addEventListener('input', e=>{ setIssue(e.target.value); });
-
-// ——— Detailed AI renderer ———
-function renderAIBlock(rule, ctx){
-  const { title, causes, actions, eta, price } = rule;
-  const header = `<div class="badge">Bo'lim: ${title}</div>`;
-  const summary = `<div class="glass"><h3 style="font-size:14px;margin-bottom:4px">Qisqa xulosa</h3><p>So'rovingiz: <b>${escapeHTML(ctx.query)}</b>. ${title} bo'yicha ehtimoliy nosozliklar topildi. Pastda bosqichma‑bosqich yo'riqnoma berildi.</p></div>`;
-  const causeList = `<div class="glass"><h3 style="font-size:14px;margin-bottom:4px">Ehtimoliy sabablar</h3><ul style="margin:0;padding-left:18px;color:var(--text);">${causes.map(c=>`<li>${c}<\/li>`).join('')}</ul></div>`;
-  const diag = `<div class="glass"><h3 style="font-size:14px;margin-bottom:4px">Uy sharoitida tekshiruv</h3><ol style="margin:0;padding-left:18px;color:var(--text);">${composeHomeChecks(rule.key).map(x=>`<li>${x}<\/li>`).join('')}</ol></div>`;
-  const fix = `<div class="glass"><h3 style="font-size:14px;margin-bottom:4px">Tavsiya etilgan yechim</h3><ul style="margin:0;padding-left:18px;color:var(--text);">${actions.map(a=>`<li>${a}<\/li>`).join('')}</ul></div>`;
-  const meta = `<div class="grid-2"><div class="badge">Vaqt: ${eta}</div><div class="badge">Narx: ${price}</div></div>`;
-  const safety = `<div class="glass"><h3 style=\"font-size:14px;margin-bottom:4px\">Ma'lumot xavfsizligi</h3><ul style=\"margin:0;padding-left:18px;color:var(--text);\"><li>Zaxira nusxa yarating (Google/ iCloud/Kompyuter).</li><li>Namlik/ekran muammosida qurilmani ishlatishni cheklang va o'chiring.</li><li>Har doim rasmiy zaryadlovchi va sifatli kabeldan foydalaning.</li></ul></div>`;
-  const promo = `<div class="glass" style="display:flex;align-items:center;justify-content:space-between;gap:8px;"><div><div style="font-weight:600">📣 Teleshop</div><p class="muted" style="margin-top:4px">Yangiliklar va aksiyalar</p></div><a class="btn primary" href="https://t.me/teleshopuz" target="_blank" rel="noopener">Obuna bo‘ling</a></div>`;
-  return [header, summary, causeList, diag, fix, meta, safety, promo].join('');
-}
-
-function composeHomeChecks(key){
-  switch(key){
-    case 'display':
-      return [
-        "Qattiq himoya oynasini (zaschitniy steklo) olib sinab ko'ring",
-        "Screenshotda chiziq/nuqta ko'rinadimi tekshiring (ko'rinsa — dasturiy, ko'rinmasa — apparat buzilishi)",
-        "Sensor test ilovasi orqali multi‑touch va o'lik nuqtalarni tekshiruvi",
-        "Ekranni avtomatik yorqinligini o'chirib, statik yorqinlikda sinab ko'ring"
-      ];
-    case 'battery':
-      return [
-        "Boshqa original adapter/kabel bilan sinab ko'ring",
-        "Zaryad portini ehtiyotkorlik bilan tozalang (yog'och tish cho'p yordamida)",
-        "Batareya sog'ligini tekshiring (Android: *AccuBattery*, iOS: *Settings → Battery → Health*)",
-        "Keraksiz ilovalarni va fon jarayonlarini o'chirish orqali quvvat sarfini kuzating"
-      ];
-    case 'water':
-      return [
-        "Qurilmani **darhol** o'chiring va uni qayta yoqishga urinmang",
-        "Zaryadga **mutlaqo** qo'ymang",
-        "SIM tray va portlarni fen yordamida quritishga urinmang (issiq havo ichki qismlarni buzadi)",
-        "Servisga tezda murojaat qiling — korroziya vaqt o'tishi bilan kuchayadi va tiklab bo'lmas holga keltiradi"
-      ];
-    case 'camera':
-      return [
-        "Kamerani boshqa ilovada (masalan, Telegram kamerasida) sinab ko'ring",
-        "Kamera ilovasi ma'lumotlari va keshini tozalang (Sozlamalar → Ilovalar)",
-        "Linza/qopqoqni mikrofibra mato bilan tozalang",
-        "Old kamera ishlayotganini, lekin asosiy kamera ishlamayotganini tekshiring (aks holda apparat muammo ehtimoli yuqori)"
-      ];
-    case 'network':
-      return [
-        "Aviorejimni 30 soniyaga yoqib o'chiring",
-        "APN (Access Point Names) sozlamalarini standartga qaytaring (Sozlamalar → Mobil tarmoq → APN)",
-        "SIM kartani boshqa telefonda sinab ko'ring yoki boshqa SIM kartani o'zingizda sinab ko'ring",
-        "Tarmoq sozlamalarini qayta tiklash (Wi-Fi, mobil ma'lumotlar, Bluetooth)"
-      ];
-    case 'lag':
-      return [
-        "So'nggi o'rnatilgan ilovalarni vaqtincha o'chiring (ular xotirani to'ldirishi yoki konflikt berishi mumkin)",
-        "Bo'sh joyni 10–20% gacha oching (kamida 5GB bo'sh joy qoldiring)",
-        "Tizim yangilanishini o'rnating (ko'pincha optimalizatsiyalar kiritilgan bo'ladi)",
-        "Qizish bo'lsa, og'ir vazifalarni cheklab, himoya qopqoqsiz ishlatib ko'ring"
-      ];
-    case 'audio':
-      return [
-        "Quloqchinlarni ulab yoki uzib sinab ko'ring (audio karnay/port muammosini ajratish uchun)",
-        "Ovoz karnay (dinamik) va mikrofon teshiklarini ehtiyotkorlik bilan tozalang (chang to'planishi mumkin)",
-        "Maxfiy kodlar orqali diagnostika rejimida mikrofon va karnayni tekshiring (*#0*# Samsungda)"
-      ];
-    case 'buttons':
-      return [
-        "Himoya g'ilofi (chexol) sabab bo'layotganini tekshirish uchun uni olib sinab ko'ring",
-        "Tugmalar atrofidagi chang va kirni tekshiring",
-        "Qurilmani xavfsiz rejimda (Safe Mode) yuklab, tugmalar ishini tekshiring (Dasturiy konfliktni aniqlash uchun)"
-      ];
-    case 'software':
-      return [
-        "Kerakli barcha ma'lumotlaringizni zaxira nusxasini yarating (bu eng muhim qadam!)",
-        "Telefonni to'liq o'chirib, qayta yoqing (reboot)",
-        "Telefonni zavod sozlamalariga qaytarishga urinib ko'ring (oxirgi chora)"
-      ];
-    case 'storage':
-      return [
-        "Ilovalarning kesh xotirasini muntazam tozalang (Telegram, Browser, TikTok kabi)",
-        "Keraksiz katta fayllar (videolar, yuklamalar) va foto/videolarning bulutli zaxira nusxalarini tekshiring",
-        "SD-kartadan foydalansangiz, uni olib telefonda bo'sh joy qandayligini tekshiring (SD-kartada xato bo'lishi mumkin)"
-      ];
-    default:
-      return [
-        "Umumiy tekshiruv: telefonni qayta ishga tushiring (restart)",
-        "Tizim yangilanishlarini tekshiring va o'rnating",
-        "So'nggi o'rnatilgan ilovalarni tekshiring va keraksizlarini o'chiring",
-        "Zaxira nusxa yaratib, zavod sozlamalariga qaytarishni ko'rib chiqing (oxirgi chora)"
-      ];
+/* ===========================================
+   SPEECH RECOGNITION (STT)
+=========================================== */
+function startSpeech(){
+  if(!("webkitSpeechRecognition" in window)){
+    alert("Sizning qurilmangiz ovoz funksiyasini qo‘llab-quvvatlamaydi.");
+    return;
+  }
+  let r=new webkitSpeechRecognition();
+  r.lang="uz-UZ";
+  r.interimResults=false;
+  r.start();
+  r.onresult=function(e){
+    document.getElementById("problemInput").value=e.results[0][0].transcript;
   }
 }
 
-    function escapeHTML(str){ return (str||'').replace(/[&<>"']/g, s=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[s])); }
+/* ===========================================
+   DIAGNOSTIC DATABASE
+=========================================== */
+const DB=[
 
-    aiBtn.addEventListener('click', async ()=>{
-      const text = [state.issue, state.model, state.brand].join(' ').trim();
-      if(!text){ alert("Muammoni yozing"); return; }
+{
+keywords:["qizib","issiq","qizish"],
+title:"🔥 Telefon qizib ketmoqda",
+text:`Telefonning qizib ketishi ko‘pincha quyidagi sabablar bilan bog‘liq:
 
-      // Local rule match
-      const rule = AI_RULES.find(r=> r.pattern.test(text));
+🔥 **Asosiy sabablar:**
+• Fon ilovalari juda ko‘p ishlayapti  
+• O‘yinlar uzoq vaqt davomida ishlatilgan  
+• Kamera bilan 4K video yozilgan  
+• Qalin chexol havo aylanishiga to‘sqinlik qilmoqda  
+• Batareya eskirgan yoki shishgan  
+• Processor throttling qilmoqda  
 
-      // Optional GPT backend (if you wire /ai)
-      // const gpt = await callGPT(text).catch(()=>null);
+🛠 **Yechimlar:**
+1) Telefonni 5–10 daqiqa sovuting  
+2) Qalin chexolni vaqtincha yeching  
+3) Keraksiz ilovalarni yoping  
+4) Ekran yorqinligini pasaytiring  
+5) Telefonni qayta yoqing  
 
-      const blocks = [];
-      if(rule) blocks.push(renderAIBlock(rule, { query: text }));
+⚠️ **Agar harorat 45°C+ bo‘lsa — ustaxonaga boring!**`
+},
 
-      // If GPT supplied, append below (uncomment when backend ready)
-      // if(gpt && gpt.detail){
-      //   blocks.push(`<div class="glass"><h3 style="font-size:14px">GPT qo'shimcha tafsiloti</h3><p>${escapeHTML(gpt.detail)}</p></div>`);
-      // }
+{
+keywords:["zaryad","batareya","akum","tez tug","kam ushlab"],
+title:"🔋 Batareya juda tez tugayapti",
+text:`Batareya tez tugashi 3 asosiy sabab bilan bog‘liq:
 
-      // If no rule hit, give a generic but detailed template
-      if(!blocks.length){
-        blocks.push(`<div class=\"glass\"><h3 style=\"font-size:14px\">Umumiy yo'riqnoma</h3><p>So'rov: <b>${escapeHTML(text)}</b>. Muammo aniq emas. Iltimos, simptomlarni batafsil yozing: qachondan boshlangan, qaysi ilovada, xato xabarlari, suv/zarba bo'lgan‑bo'lmagan.</p></div>`);
-      }
+🔋 **Muammolar:**
+• Batareya eskirgan (80% health’dan past)  
+• 5G, GPS yoki hotspot energiyani yeyapti  
+• Ilovalar fon rejimda ishlayapti  
+• Ekran yorqinlik 100%  
+• Tez zaryadlash adapteri noto‘g‘ri  
 
-      // Special quick help for lag/freeze even if another category matched too
-      if(/qotib|lag|sekin|restart|o'chib|freeze|hanging/i.test(text)){
-        blocks.push(`<div class=\"glass\"><h3 style=\"font-size:14px\">Tez yordam: qotib ishlash</h3><ol style=\"margin:0;padding-left:18px\"><li>Fon ilovalarni yopish va keshni tozalash</li><li>Ilova ruxsatlarini tartibga keltirish (Background limits)</li><li>"Safe mode"da ishga tushirib sinash</li><li>Muammo davom etsa: dasturiy qayta yozish tavsiya etiladi</li></ol></div>`);
-      }
+🛠 **Yechimlar:**
+• Keraksiz fon ilovalarini o‘chiring  
+• Ekranni 30–40% yorqinlikda ishlating  
+• Original adapterdan foydalaning  
+• Power Saving rejimini yoqing  
 
-      aiRes.innerHTML = blocks.join('');
-      aiWrap.classList.remove('hidden');
+💡 **PRO Maslahat:** Telefonni 20%–80% oralig‘ida zaryadlang — batareya umrini 2 baravar uzaytiradi.`
+},
 
-      pushHistory({ brand: state.brand, model: state.model, issue: state.issue });
-    });
+{
+keywords:["singan","yoriq","ekran","display"],
+title:"📱 Ekran singan yoki yoriq",
+text:`Ekran muammolari 2 turga bo‘linadi:
 
-    async function callGPT(query){
-      // Backendda /ai endpointingiz OpenAI bilan muloqot qiladi.
-      // return fetch('/ai', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ q: query, brand: state.brand, model: state.model }) }).then(r=>r.json());
-      return null;
+🪟 **1) Faqat oynasi singan:**
+Sensor ishlaydi, ranglar to‘g‘ri — oynani almashtirish kifoya.
+
+💥 **2) Matritsa (AMOLED/LCD) shikastlangan:**
+• Chiziqlar paydo bo‘lgan  
+• Ranglar buzilgan  
+• Sensor javob bermaydi  
+
+🛠 **Yechim:**
+Ekran faqat modul bilan almashtiriladi. Yopishtirish yoki “polir” qilish yordam bermaydi.`
+},
+
+{
+keywords:["yonmay","yoqilmay","ochilmay","ishga tushmay"],
+title:"⚫ Telefon umuman yonmayapti",
+text:`Telefonning yonmasligi — jiddiy muammo.
+
+⚫ **Sabablari:**
+• Batareya umuman o‘lgan  
+• Quvvat yo‘liga suv kirgan  
+• Power IC chip kuygan  
+• On/Off tugmasi ishlamayapti  
+• Ekran butunlay ishdan chiqqan  
+
+🛠 **Tekshirish:**
+1) Quvvat tugmasini 10 sekund bosib turing  
+2) Boshqa adapter/kabel bilan quvvatlab ko‘ring  
+3) Kompyuterga ulab ko‘ring  
+
+⚠️ **Hech reaksiya bo‘lmasa — servisga borish shart.**`
+},
+
+{
+keywords:["ilova","kirmaydi","ochilmaydi","tushib","error"],
+title:"📂 Ilovalar ochilmayapti yoki ishlamayapti",
+text:`📂 Ilovalarning ishlamasligiga sabablar:
+
+• Kesh buzilgan  
+• Internet bilan bog‘liq muammo  
+• Xotira to‘lgan  
+• Telefon eskirgan  
+• Virusli APK o‘rnatilgan  
+
+🛠 **Yechim:**
+• Ilova keshini tozalang  
+• Telefonni qayta yoqing  
+• Ilovani qayta o‘rnating  
+• Xotirada kamida 2GB bo‘sh joy qoldiring`
+},
+
+{
+keywords:["sim","simk","tarmoq","oqimaydi","signal yoq"],
+title:"📶 SIM karta o‘qilmayapti",
+text:`SIM kartaning o‘qilmasligi ko‘p uchraydi.
+
+📶 **Sabablari:**
+• Tray egilgan  
+• SIM kontakti oksidlangan  
+• Baseband chip nosoz  
+• SIM noto‘g‘ri kesilgan  
+• IMEI o‘chgan (null)
+
+🛠 **Yechim:**
+• SIMni boshqa telefonda sinab ko‘ring  
+• Trayni tozalang  
+• *#06# terib IMEI ni tekshiring  
+• IMEI yo‘q bo‘lsa — Baseband tiklanishi kerak`
+},
+
+{
+keywords:["qotadi","lag","sek","sekin","tizim sekin"],
+title:"🐌 Telefon qotmoqda va juda sekin ishlamoqda",
+text:`🐌 Telefonning qotishi sabablari:
+
+• Xotira 90% dan oshgan  
+• Protsessor qizigan  
+• Virusli ilovalar o‘rnatilgan  
+• RAM etishmayapti  
+
+🛠 **Yechim:**
+• Keraksiz ilovalarni o‘chiring  
+• Keshni tozalang  
+• Telefonni restart qiling  
+• Virus tekshiruvidan o‘tkazing  
+
+💡 2–3 yillik telefonlarda *fabrik reset* juda yaxshi yordam beradi.`
+},
+
+{
+keywords:["kamera","xira","fokus","tushmaydi"],
+title:"📸 Kamera xiralashgan yoki fokus ishlamayapti",
+text:`📸 Kamera muammolari:
+
+• Kamera oynasi ifloslangan  
+• Stabilizator buzilgan  
+• Linza ostiga chang kirgan  
+• Modul suvdan zararlangan  
+
+🛠 **Yechim:**
+• Mikrofiber bilan tozalang  
+• Fokus ishlamasa — modulni almashtirish kerak  
+• Suv kirgan bo‘lsa — quritish yordam bermaydi, servis shart`
+},
+
+{
+keywords:["ovoz","dinamik","past","chiqmayapti"],
+title:"🔈 Ovoz past chiqmoqda yoki umuman chiqmayapti",
+text:`🔈 Dinamik muammolari:
+
+• Chang bilan to‘lib qolgan  
+• Suv kirgan  
+• Audio IC nosoz  
+• Panjara ifloslangan  
+
+🛠 **Yechim:**
+• Havo balonchasi bilan tozalang  
+• Quloqchin orqali ovoz chiqsa — dinamik buzilgan  
+• Audio IC buzilgan bo‘lsa — chipni almashtirish kerak`
+},
+
+{
+keywords:["zaryad olmaydi","quvvat olmaydi","charging"],
+title:"⚡ Telefon zaryad olmayapti",
+text:`⚡ Sabablari:
+
+• Port ichida chang  
+• Kabel nosoz  
+• Zaryadlash chipi kuygan  
+• Suv ta’siri  
+
+🛠 **Yechim:**
+• Portni tish qurtlari yoki igna bilan emas — faqat air blower bilan tozalang  
+• Original kabeldan foydalaning  
+• Zaryad foizi sakrab tursa — Charging IC nosoz`
+},
+
+{
+keywords:["suv","suvga tushgan","namlik","ho‘l"],
+title:"💧 Telefon suvga tushgan",
+text:`💧 Suv telefoni eng xavfli raqibi.
+
+❌ FEN bilan quritish — zararli!  
+❌ Quvvatga ulash — xavfli!
+
+🛠 **To‘g‘ri yo‘l:**
+1) Darhol o‘chirib qo‘ying  
+2) SIM + chexolni chiqarib qo‘ying  
+3) Quritishga qo‘ymang  
+4) Ustaxonaga olib boring  
+
+Suv oksidlanishni boshlaydi — bu qisqa tutashuvga olib keladi.`
+},
+
+{
+keywords:["xotira","joy yo‘q","tolgan","memory full"],
+title:"📁 Xotira to‘lib ketgan",
+text:`📁 Xotiraning to‘lishi:
+
+• Telefon sekin ishlaydi  
+• Kamera rasm olmaydi  
+• Ilovalar o‘chib ketadi  
+
+🛠 **Yechim:**
+• Galereyani tozalang  
+• Telegram keshini tozalang  
+• Bulutga yuklab qo‘ying (Google Drive, iCloud)`
+},
+
+{
+keywords:["wifi","internet","tarmoq muammo"],
+title:"📡 Wi-Fi yoki internet ishlamayapti",
+text:`📡 Sabablari:
+
+• Router muammosi  
+• DNS xatolari  
+• Wi-Fi modul ishdan chiqqan  
+
+🛠 **Yechim:**
+• WiFi-ni o‘chirib-yoqing  
+• Routerni restart qiling  
+• Boshqa tarmoqqa ulab ko‘ring`
+},
+
+{
+keywords:["face id","touch id","barmoq","sensor"],
+title:"🔐 Face ID / Touch ID ishlamayapti",
+text:`Biometrik tizimlar juda nozik.
+
+🛠 **Sabablari:**
+• Ekran original emas  
+• Kamera to‘silgan  
+• Sensor ifloslangan  
+• Face ID lazeri buzilgan  
+
+⚠️ iPhone Face ID moduli boshqa korpusga o‘tmaydi — servisga murojaat qilish shart.`
+},
+
+{
+keywords:["proximity","ekran o‘chmaydi","qo‘ng‘iroq"],
+title:"📞 Qo‘ng‘iroq paytida ekran o‘chmayapti",
+text:`📞 Sabablari:
+
+• Proximity sensor ishlamayapti  
+• Ekran himoyasi juda qalin  
+• Ekran original emas  
+
+🛠 **Yechim:**
+• Himoya plyonkasini almashtiring  
+• Sensor sohasini tozalang`
+},
+
+{
+keywords:["fps","oyin","lag","frame"],
+title:"🎮 O‘yinlarda FPS tushib ketmoqda",
+text:`🎮 FPS pasayish sabablari:
+
+• Telefon qizigan  
+• Grafik sozlamalar yuqori  
+• RAM yetarli emas  
+
+🛠 **Yechim:**
+• Grafikani pasaytiring  
+• Telefonni sovuting  
+• Fon ilovalarni yoping`
+},
+
+{
+keywords:["mikrofon","ovoz yozmaydi"],
+title:"🎤 Mikrofon ishlamayapti",
+text:`🎤 Sabablari:
+
+• Mikrofon teshigi changlangan  
+• Suv kirgan  
+• Audio IC buzilgan  
+
+🛠 **Yechim:**
+• Teshikni ehtiyotkorlik bilan tozalang  
+• Ovoz yozib sinab ko‘ring  
+• Yaxshilanmasa — chipni almashtirish kerak`
+},
+
+{
+keywords:["restart","o‘zi o‘chadi","o‘zi yonadi"],
+title:"🔁 Telefon o‘zi-o‘zidan qayta ishga tushmoqda",
+text:`🔁 Restart loop sabablar:
+
+• Batareya kontaktida muammo  
+• CPU haddan tashqari qizish  
+• System fayllari buzilgan  
+
+🛠 Yechim:
+• Yangilanishni o‘rnating  
+• Zaxira qilib, reset qiling  
+• Ustaxonada diagnostikadan o‘tkazing`
+},
+
+{
+keywords:["virus","reklama","spam","apk"],
+title:"🦠 Telefon virusga chalindi",
+text:`🦠 Virus belgilari:
+
+• O‘zi ilova ochiladi  
+• Reklamalar chiqaveradi  
+• Telefon qotadi  
+
+🛠 Yechim:
+• Antivirus o‘rnating  
+• Noma’lum APKlarni o‘chirib tashlang  
+• Brauzer keshini tozalang`
+},
+
+{
+keywords:["bluetooth","ulanish","pair","device"],
+title:"🔵 Bluetooth ulanmayapti",
+text:`🔵 Sabablari:
+
+• Qurilma oldin boshqa telefon bilan juftlangan  
+• Versiya mos emas  
+• Bluetooth drayver xatosi  
+
+🛠 **Yechim:**
+• Bluetoothni 10 sekundga o‘chirib qo‘ying  
+• “Forget device” ni bosing  
+• Qayta ulab ko‘ring`
+},
+
+{
+keywords:["kamera qop qora","kamera ishlamaydi"],
+title:"📷 Kamera ochilmayapti (qora ekran)",
+text:`📷 Kamera ochilganda qora ekran chiqsa:
+
+• Kamera moduliga quvvat yetmayapti  
+• Kamera shleyfi uzilgan  
+• Ilova ruxsatlari o‘chirilgan  
+
+🛠 **Yechim:**
+• Sozlamalardan kamera ruxsatini yoqing  
+• Telefonni qayta yoqing  
+• Modulni tekshirtiring`
+},
+
+{
+keywords:["speaker","dinamik","musiqa past"],
+title:"🔊 Musiqa ovozi past chiqmoqda",
+text:`🔊 Sabablari:
+
+• Dinamik changlangan  
+• Suv ta’siri  
+• Audio equalizer noto‘g‘ri  
+
+🛠 Yechim:
+• Panjarani yengil tozalang  
+• Equalizer-ni tekshiring  
+• Suv kirgan bo‘lsa — quritish emas, servisga olib boring`
+},
+
+{
+keywords:["type c","port","usb ishlamaydi"],
+title:"🔌 USB / Type-C port ishlamayapti",
+text:`🔌 Sabablari:
+
+• Port ichida chang  
+• Kontakt oksidlashgan  
+• Port shikastlangan  
+
+🛠 Yechim:
+• Air blower bilan tozalang  
+• Zaryadlovchini tekshiring  
+• Portni almashtirish kerak bo‘lishi mumkin`
+},
+
+{
+keywords:["sensor","sensor ishlamaydi","touch"],
+title:"🖐️ Sensor ishlamayapti",
+text:`🖐️ Sensor muammosi:
+
+• Ekran original emas  
+• Sensor shikastlangan  
+• Suv kirgan  
+
+🛠 Yechim:
+• Ekranni tekshirtiring  
+• Himoya plyonkasi sensorli bo‘lmagan bo‘lishi mumkin`
+},
+
+{
+keywords:["galereya","rasm ochilmaydi","media"],
+title:"🖼️ Galereya rasm ochmayapti",
+text:`Sabablari:
+
+• Media fayllar buzilgan  
+• Xotira to‘lib ketgan  
+• Galereya keshida xato  
+
+🛠 Yechim:
+• Keshni tozalang  
+• Storage-ni bo‘shating`
+},
+
+{
+keywords:["bildirishnomalar","notification","kelmaydi"],
+title:"🔔 Bildirishnomalar kelmayapti",
+text:`🔔 Sabablar:
+
+• Notification o‘chirilgan  
+• Energiyani tejash rejimi  
+• Internet beqaror  
+
+🛠 Yechim:
+• Ilova ruxsatlarini yoqing  
+• Power Saving rejimini o‘chiring`
+},
+
+{
+keywords:["yuklanmayapti","apps yuklanmaydi","market ishlamaydi"],
+title:"⬇️ Ilovalar yuklanmayapti (Play Market / App Store)",
+text:`⬇️ Sabablar:
+
+• Internet sekin  
+• Xotira yetarli emas  
+• Market keshida xato  
+
+🛠 Yechim:
+• Market keshini tozalang  
+• Telefonni qayta yoqing  
+• Xotiradan joy bo‘shating`
+},
+
+{
+keywords:["qizil chiroq","batareya error","charging problem"],
+title:"🔴 Qizil chiroq yonib turibdi",
+text:`Bu batareya chuqur zaryadsiz holatda degani.
+
+🛠 Yechim:
+• Original adapter bilan 20 daqiqa quvvatlab ko‘ring  
+• Qizil chiroq o‘chmasa — batareya o‘lgan`
+},
+
+{
+keywords:["vibratsiya","vibro","titramayapti"],
+title:"📳 Vibratsiya ishlamayapti",
+text:`📳 Vibratsiya muammosi:
+
+• Vibramotor buzilgan  
+• Sistem sozlamasi o‘chirilgan  
+
+🛠 Yechim:
+• Sozlamalardan vibratsiyani yoqing  
+• Modulni tekshirtiring`
+},
+
+{
+keywords:["sovuqda o'chadi","sovuq","cold"],
+title:"❄️ Sovuqda telefon o‘chib qoladi",
+text:`❄️ Sovuq batareyaga kuchli ta’sir qiladi.
+
+🛠 Yechim:
+• Sovuqda quvvat past bo‘lsa ishlatmay turing  
+• Telefonni ichki kiyim cho‘ntagida olib yuring  
+• Batareya eskirgan bo‘lishi mumkin`
+},
+
+
+
+
+{
+keywords:["kamera aylanyapti","kamera ochilmayapti","loading camera"],
+title:"🔄 Kamera “Aylanmoqda” holatida qolib ketmoqda",
+text:`📷 Kamera ochilmay, faqat aylanadigan indikator chiqsa:
+
+🔧 Sabablari:
+• Kamera moduliga quvvat yetmayapti  
+• Kamera ilovasi buzilgan  
+• Stabilizator motorida nosozlik  
+• Kamera moduli boshqa ilovada band  
+
+🛠 Yechim:
+1) Barcha ilovalarni yoping  
+2) Telefonni qayta yoqing  
+3) Kamera ruxsatlarini tekshiring  
+4) Agar hali ham ochilmasa — modulni almashtirish kerak`
+},
+
+{
+keywords:["kuchli tebranish","shovqin","g‘alati ovoz"],
+title:"📡 Telefon ichidan g‘alati shovqin chiqmoqda",
+text:`📡 Agar ichidan “g‘izillash”, “shitirlash” yoki g‘alati ovoz chiqsa:
+
+🔧 Sabablari:
+• Vibramotor shikastlangan  
+• Korpus ichida bo‘sh vint  
+• Dinamik membranasi yirtilgan  
+• Suv ta’siri  
+
+🛠 Yechim:
+• Ustaxona diagnostikasi shart — ichki mexanik muammo bor.`
+},
+
+{
+keywords:["kmd sd","sd card","sd o‘qimaydi"],
+title:"💾 SD-karta o‘qilmayapti",
+text:`💾 SD-karta muammosi:
+
+🔧 Sabablari:
+• SD format mos emas  
+• Slot changlangan  
+• SD karta buzilgan  
+• Kontaktlar oksidlangan  
+
+🛠 Yechim:
+• SD kartani kompyuterda FAT32 yoki exFAT formatiga o‘tkazing  
+• Slotni havo balonchasi bilan tozalang  
+• Boshqa SD bilan sinab ko‘ring`
+},
+
+{
+keywords:["rashka","yashil ekran","display green"],
+title:"🟩 Ekran yashil yoki binafsha rangga kirib qoldi",
+text:`🟩 AMOLED ekran muammosi:
+
+🔧 Sabablari:
+• OLED matritsa yonishi (burn-in)  
+• Ekran shikastlangan  
+• Video driver nosoz  
+
+🛠 Yechim:
+• Ranglar doimiy o‘zgargan bo‘lsa — modulni almashtirish kerak  
+• Burn-in bo‘lsa maxsus filtr ilovalar vaqtinchalik yordam beradi`
+},
+
+{
+keywords:["notification lag","kech keladi","kechikish"],
+title:"⏱️ Bildirishnomalar juda kech kelmoqda",
+text:`⏱️ Kechikish sabablari:
+
+• Battery Saver rejimi  
+• Qurilma background ishlashiga ruxsat bermagan  
+• Internet uyqu rejimiga o‘tmoqda  
+
+🛠 Yechim:
+• Ilovalar uchun “Background activity” ni yoqing  
+• Power Saving rejimini o‘chiring  
+• WiFi optimize funksiyasini o‘chiring`
+},
+
+{
+keywords:["qulf","bloklandi","ekran paroli","eslab"],
+title:"🔐 Parol esdan chiqdi (Ekran qulfidan o‘tolmayapti)",
+text:`🔐 Parol esdan chiqishi — keng tarqalgan muammo.
+
+🛠 Android:
+• Google hisob bilan tiklash mumkin  
+• Ba’zan reset talab qilinadi (ma’lumotlar o‘chadi)
+
+🛠 iPhone:
+• DFU Rejimida tiklash kerak  
+• iCloud orqali o‘chirib tiklash mumkin
+
+⚠️ Qulfni buzishning noqonuniy usullari mavjud emas.`
+},
+
+{
+keywords:["lag keyboard","klaviatura sekin","yozishda qotadi"],
+title:"⌨️ Klaviatura kechikib yozmoqda",
+text:`⌨️ Sabablari:
+
+• RAM to‘lgan  
+• Kesh buzilgan  
+• Klaviatura ilovasi eskirgan  
+
+🛠 Yechim:
+• Klaviatura keshini tozalang  
+• Telefonni restart qiling  
+• Gboard yoki Samsung Keyboard-ni yangilang`
+},
+
+{
+keywords:["hotspot","tethering ishlamaydi"],
+title:"📶 Hotspot ishlamayapti yoki ulana olmayapti",
+text:`📶 Sabablari:
+
+• Operator hotspotni cheklagan  
+• Tarmoq sozlamalari buzilgan  
+• DNS muammosi  
+
+🛠 Yechim:
+• APN sozlamalarini tiklang  
+• Hotspot nomi va parolini o‘zgartiring  
+• Telefonni qayta yoqing`
+},
+
+{
+keywords:["kuchli vibratsiya","telefon titrayapti"],
+title:"😵 Telefon o‘z-o‘zidan tebranayapti",
+text:`😵 Muammo sabablari:
+
+• Ilovalardan biri notog‘ri bildirishnoma yuboryapti  
+• Vibramotor tiqilib qolgan  
+• Virusli reklama  
+
+🛠 Yechim:
+• Bildirishnomalar logini tekshiring  
+• Antivirus bilan tozalang  
+• Vibramotorni servisda tekshirtiring`
+},
+
+{
+keywords:["charging reverse","teskari zaryad","reverse charging"],
+title:"🔄 Telefon boshqa qurilmani zaryadlab qo‘ymoqda",
+text:`Bu Wireless PowerShare funksiyasi tasodifan yoqilgan bo‘lishi mumkin.
+
+🛠 Yechim:
+• Battery Settings → Wireless PowerShare → OFF  
+• Telefon qizib ketsa — funksiyani ishlatmang`
+},
+
+{
+keywords:["dark spot","qora nuqta","ekranda nuqta"],
+title:"⚫ Ekranda qora nuqta paydo bo‘lgan",
+text:`⚫ Bu — o‘lik piksel yoki AMOLEDda “burn-in”.
+
+🛠 Yechim:
+• Pixel refresher ilovalari vaqtincha yordam beradi  
+• Agar nuqta kattalashsa — ekran moduli almashtiriladi`
+},
+
+{
+keywords:["light bleed","yorug‘lik sizishi","ekran chetida nur"],
+title:"🌟 Ekran chetlaridan nur chiqmoqda (Light Bleed)",
+text:`🌟 LCD ekranlarda keng tarqalgan.
+
+🛠 Sabablar:
+• Ekran ramkasi siqilgan  
+• Panel bosilgan  
+• Ishlab chiqarish nuqsoni  
+
+🔧 Yechim:
+• Light bleedni to‘liq yo‘qotib bo‘lmaydi  
+• Kuchli bo‘lsa — modulni almashtirish kerak`
+},
+
+{
+keywords:["lag scroll","skroll sekin"],
+title:"📜 Skroll qilishda lag paydo bo‘lmoqda",
+text:`📜 Sabablari:
+
+• 60Hz ekran  
+• System animatsiya og‘irlashgan  
+• RAM etishmayapti  
+
+🛠 Yechim:
+• 120Hz rejimni yoqing (agar bo‘lsa)  
+• Animatsiya tezligini Developer Options’dan kamaytiring`
+},
+
+{
+keywords:["touch ghost","o‘zi bosadi","ghost touch"],
+title:"👻 Telefon o‘zi sensorni bosayotgandek bo‘lyapti (Ghost Touch)",
+text:`👻 Ghost touch — xavfli belgidir.
+
+🛠 Sabablari:
+• Ekran matritsasi shikastlangan  
+• Namlik kirgan  
+• Arzon zaryadlovchi shovqin berayotgan  
+
+🔧 Yechim:
+• Ekran modulini tekshirtiring  
+• Faqat original quvvatlashdan foydalaning`
+},
+
+{
+keywords:["vol button","tugma ishlamaydi"],
+title:"🔘 Ovozni oshirish/pasaytirish tugmalari ishlamayapti",
+text:`🔘 Sabablari:
+
+• Tugma ostiga chang kirgan  
+• Lenta-shleyf uzilgan  
+• Korpus sinishi  
+
+🛠 Yechim:
+• Tugma shleyfini almashtirish kerak  
+• Arzon ta’mir emas, qismini almashtirish tavsiya etiladi`
+},
+
+{
+keywords:["haptic","vibration no"], 
+title:"🌀 Haptic Feedback ishlamayapti",
+text:`🌀 Haptic feedback — tebranishning maxsus nazorati.
+
+🔧 Sabablari:
+• Vibramotor ishlamayapti  
+• System haptic o‘chirilgan  
+
+🛠 Yechim:
+• Sozlamalardan Haptic ni yoqing  
+• Agar javob bo‘lmasa — modul tiqilib qolgan bo‘lishi mumkin`
+},
+
+{
+keywords:["app icon yoqolgan","ilova belgisi yoq"],
+title:"❓ Ilova belgisi g‘oyib bo‘lib qolgan",
+text:`❓ Sabablari:
+
+• Ilova yashirilgan  
+• Launcher buzilgan  
+• System glitch  
+
+🛠 Yechim:
+• App listdan qayta qo‘shing  
+• Launcher keshini tozalang  
+• Reboot qiling`
+},
+
+{
+keywords:["wifi calling","volte yoq","qo‘ng‘iroq chiqmaydi"],
+title:"📞 Qo‘ng‘iroq paytida ovoz yo‘q / ulmaydi",
+text:`📞 Sabablari:
+
+• VoLTE o‘chiq  
+• Operator sozlamalari noto‘g‘ri  
+• Mikrofon/antenna muammosi  
+
+🛠 Yechim:
+• VoLTE ni yoqing  
+• APN sozlamasini tiklang`
+},
+
+{
+keywords:["tungi kamerada yomon","night mode"],
+title:"🌙 Tungi rasm juda yomon chiqmoqda",
+text:`🌙 Sabablari:
+
+• Sensor kichik  
+• Stabilizator ishlamayapti  
+• Obyektiv iflos  
+
+🛠 Yechim:
+• Stabilizatsiyani yoqing  
+• Obyektivni mikrofiber bilan tozalang`
+},
+
+{
+keywords:["screen rotation","rotatsiya yoq","orientatsiya"],
+title:"🔄 Ekran aylanishi ishlamayapti",
+text:`🔄 Sabablari:
+
+• Auto-rotate o‘chirilgan  
+• Gyroscope ishlamayapti  
+
+🛠 Yechim:
+• Quick Panel → Auto Rotate yoqing  
+• Sensor testidan o‘tkazing`
+},
+
+{
+keywords:["touch id xizmat yo'q","parmak izi tanimaydi"],
+title:"🧬 Fingerprint juda sekin tanimoqda",
+text:`🧬 Sabablari:
+
+• Barmoq nam yoki iflos  
+• Sensor ostida chang  
+• Arzon ekran almashtirilgan  
+
+🛠 Yechim:
+• Barmoqni qayta skaner qiling  
+• Himoya plyonkasini almashtiring`
+},
+
+{
+keywords:["screen jitter","titroq","flicker"],
+title:"⚡ Ekran titrayapti (Flickering)",
+text:`⚡ Sabablari:
+
+• AMOLED PWM muammosi  
+• Video driver kuchsiz  
+• Ekran shikastlangan  
+
+🛠 Yechim:
+• Dark Mode yoqing  
+• Ekran yorqinligini o‘zgartiring  
+• Kuchaymasa — modulni almashtirish kerak`
+},
+
+{
+keywords:["random vibro","notification yo‘q lekin titrayapti"],
+title:"🔔 Xabar yo‘q, lekin telefon tebranmoqda",
+text:`🔔 Buning 3 sababi bor:
+
+• Background app vibratsiya buyruq yuboryapti  
+• Ghost Touch  
+• Virusli reklama  
+
+🛠 Yechim:
+• Aktiv ilovalar ro‘yxatini tekshiring  
+• Antivirus bilan skaner qiling"`
+},
+
+{
+keywords:["airplane mode","tarmoq yo‘q","signal"],
+title:"✈️ Airplane mode o‘chmayapti",
+text:`✈️ Sabablari:
+
+• Tizimdagi xatolik  
+• SIM modul ishlamayapti  
+
+🛠 Yechim:
+• Restart qiling  
+• SIM trayni tekshiring  
+• System update qiling`
+},
+
+{
+keywords:["qora ekran","ekran past yorqinlik"],
+title:"🕶️ Ekran juda qorong‘i bo‘lib qolgan",
+text:`🕶️ Sabablari:
+
+• Adaptive brightness buzilgan  
+• Sensor ifloslangan  
+
+🛠 Yechim:
+• Avto-yorqinlikni o‘chiring  
+• Sensorni tozalang  
+• Ekran modulini tekshirtiring`
+},
+
+{
+keywords:["touch delay","sensor kechikish"],
+title:"⌛ Sensor bosish kechikmoqda",
+text:`⌛ Sabablari:
+
+• FPS past  
+• Ekran matritsasi eskirgan  
+• Animatsiya og‘ir  
+
+🛠 Yechim:
+• 120Hz rejimni yoqing (bo‘lsa)  
+• System animatsiyalarini 0.5x ga tushiring`
+},
+
+{
+keywords:["gallery crash","galereya yopilvotti"],
+title:"🔄 Galereya o‘z-o‘zidan yopilyapti",
+text:`🔄 Sabablari:
+
+• Media fayllar buzilgan  
+• Kesh to‘lgan  
+• Ilova yangilanishi shart  
+
+🛠 Yechim:
+• Keshni tozalang  
+• Galereyani yangilang`
+},
+
+{
+keywords:["dual app","klon ilova muammo"],
+title:"🟦 Klonlangan ilovalar ishlamayapti",
+text:`🟦 Sabablari:
+
+• System dual app xatosi  
+• Xotira yetmayapti  
+
+🛠 Yechim:
+• Klonlangan ilovani o‘chirib qayta yarating  
+• Telefonni qayta yoqing`
+},
+
+{
+keywords:["carplay","android auto","ulanish muammo"],
+title:"🚗 CarPlay / Android Auto ulanmayapti",
+text:`🚗 Sabablari:
+
+• USB kabel mos emas  
+• Port shikastlangan  
+• Ilovalar yangilanmagan  
+
+🛠 Yechim:
+• Sertifikatlangan USB kabel ishlating  
+• Mashina sistemini qayta ishga tushiring`
+},
+
+{
+keywords:["compass","kompas ishlamaydi"],
+title:"🧭 Kompas noto‘g‘ri ko‘rsatayapti",
+text:`🧭 Sabablari:
+
+• Magnet sensor buzilgan  
+• Kalibrovka kerak  
+
+🛠 Yechim:
+• “∞” shaklida telefonni aylantirib kalibrovka qiling`
+},
+
+{
+keywords:["charge reverse","zaryad kamaymoqda zaryad olayotganda"],
+title:"🚨 Zaryad olayotganda ham quvvat kamaymoqda!",
+text:`🚨 Bu juda xavfli holat.
+
+🔧 Sabablari:
+• Adapter kuchsiz  
+• Charging IC nosoz  
+• Port oksidlangan  
+
+🛠 Yechim:
+• Yangi original adapter sinab ko‘ring  
+• Kuchaymasa — servisga murojaat shart`
+},
+
+
+
+];
+
+/* ===========================================
+   DIAGNOSTIC ENGINE
+=========================================== */
+function diagnose(){
+  let text=document.getElementById("problemInput").value.toLowerCase();
+  let box=document.getElementById("resultBox");
+  box.innerHTML="";
+
+  if(!text.trim()){
+    box.innerHTML=`<div class='result-card'><div class='result-title'>⚠️ Xatolik</div><div class='result-text'>Muammoni yozmadingiz.</div></div>`;
+    return;
+  }
+
+  let found=false;
+  DB.forEach(item=>{
+    if(item.keywords.some(k=>text.includes(k))){
+      found=true;
+      box.innerHTML+=`<div class='result-card'><div class='result-title'>${item.title}</div><div class='result-text'>${item.text}</div></div>`;
     }
+  });
 
-    // ——— History ———
-    function pushHistory(item){
-      const rec = { ...item, ts: Date.now() };
-      const arr = [rec, ...state.history].slice(0,10);
-      state.history = arr; localStorage.setItem('tx_history', JSON.stringify(arr));
-      renderHistory();
-    }
-    function clearHistory(){
-      state.history = []; localStorage.removeItem('tx_history'); renderHistory();
-    }
-    window.clearHistory = clearHistory;
+  if(!found){
+    box.innerHTML=`<div class='result-card'>
+      <div class='result-title'>🤖 Maxsus diagnostika</div>
+      <div class='result-text'>
+        Siz yozgan muammo bo‘yicha aniq kategoriya topilmadi.  
+        Lekin bu modul, sensor yoki dasturiy nosozlik bo‘lishi mumkin.  
+        Telefonni qayta yoqing va uzoq ishlatib ko‘ring. Agar muammo davom etsa — servisga murojaat qiling.
+      </div>
+    </div>`;
+  }
+}
 
-    function resetBrandModel(){
-        state.brand = '';
-        state.model = '';
-        initBrands();
-        updateModels();
-    }
-    window.resetBrandModel = resetBrandModel;
+/* ===========================================
+   GUIDE CONTENT
+=========================================== */
+document.getElementById("guide-page").innerHTML = `
+<div class='guide-card'>
+  <div class='guide-title'>⚡ Telefon juda tez qizib ketmoqda</div>
+  <div class='guide-desc'>
+    Telefon yuklama ostida qizishi normal, ammo doimiy qizish quyidagilardan:
+    <br>• Protsessor haddan tashqari yuklangan  
+    <br>• Kesh to‘lgan, fon ilovalar ko‘p  
+    <br>• Batareya eskirgan  
+    <br>• Ekran yorqinligi maksimalda  
+    <br><br>
+    ✔ Yechim: Sovuting, keraksiz ilovalarni yopib chiqing, 20 daqiqaga o‘chirib qo‘ying.
+  </div>
+</div>
 
+<div class='guide-card'>
+  <div class='guide-title'>🔋 Batareya juda tez tugab qolmoqda</div>
+  <div class='guide-desc'>
+    Sabablari:
+    <br>• 5G, GPS, hotspot ochiq qolgan  
+    <br>• Ekran 120Hz rejimda ishlamoqda  
+    <br>• Xotira to‘lgan yoki ilovalar fon rejimda  
+    <br><br>
+    ✔ Ideal zaryad diapazoni: 20% – 80%  
+    <br>✔ Batareya salomatligi 80% dan past bo‘lsa — almashtirish kerak.
+  </div>
+</div>
 
-    function renderHistory(){
-      if(!state.history.length){ histCard.classList.add('hidden'); return; }
-      histCard.classList.remove('hidden');
-      histList.innerHTML = state.history.map(h=>{
-        const t = new Date(h.ts).toLocaleTimeString();
-        const bm = `${h.brand||'—'} ${h.model||''}`.trim();
-        const iss = h.issue||'—';
-        return `<div class="glass" style="padding:10px;display:flex;align-items:center;justify-content:space-between;gap:8px;">\
-          <div style="min-width:0">\
-            <div style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${bm||'Model kiritilmagan'}<\/div>\
-            <div class="muted" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${iss}<\/div>\
-          <\/div>\
-          <span class="badge">${t}<\/span>\
-        <\/div>`
-      }).join('');
-    }
+<div class='guide-card'>
+  <div class='guide-title'>📱 Ekran yorilgan yoki sensor ishlamayapti</div>
+  <div class='guide-desc'>
+    Ekran shikastlanishining 3 turi mavjud:
+    <br>1) Faqat oynasi singan  
+    <br>2) Matritsa (LCD/AMOLED) shikastlangan  
+    <br>3) Sensor qatlam ishdan chiqqan  
+    <br><br>
+    ✔ Buni hech qanday dastur tuzatmaydi — faqat modulni almashtirish orqali tuzatiladi.
+  </div>
+</div>
 
-    // ——— Tabs ———
-    function goTab(key){
-      document.querySelectorAll('.tab').forEach(el=> el.classList.add('hidden'));
-      document.querySelector(`section[data-tab="${key}"]`)?.classList.remove('hidden');
-      document.querySelectorAll('.nav .btn').forEach(b=> b.classList.remove('active'));
-      document.querySelectorAll('.nav [data-nav]').forEach(b=> b.classList.remove('active'));
-      document.querySelector(`.nav [data-nav="${key}"]`)?.classList.add('active');
+<div class='guide-card'>
+  <div class='guide-title'>⚫ Telefon umuman yoqilmayapti</div>
+  <div class='guide-desc'>
+    Mutlaq belgilar:
+    <br>• Quvvat tugmasi ishlamayapti  
+    <br>• Batareya kuygan  
+    <br>• Power IC nosoz  
+    <br>• Telefon suv yoki kuchli zarbaga uchragan  
+    <br><br>
+    ✔ 10 sekund Power tugmasini bosib ushlab ko‘ring  
+    <br>✔ Boshqa kabel sinab ko‘ring  
+    <br>✔ Hech reaksiya bo‘lmasa — servisga murojaat qilish shart.
+  </div>
+</div>
 
-      if(key==='home') renderHistory();
-      window.scrollTo({top:0, behavior:'smooth'});
-    }
-    window.goTab = goTab;
-    function sendQuick(type){ try{ tg?.sendData?.(JSON.stringify({action:type, ts:Date.now()})); }catch(e){} }
+<div class='guide-card'>
+  <div class='guide-title'>📂 Ilova ochilmayapti yoki o‘chib ketmoqda</div>
+  <div class='guide-desc'>
+    Sabablari:
+    <br>• Kesh buzilgan  
+    <br>• Yangilash talab qilinadi  
+    <br>• Virusli APK o‘rnatilgan  
+    <br>• Xotira juda to‘lgan  
+    <br><br>
+    ✔ Ilovani qayta o‘rnating  
+    ✔ Keshni tozalang  
+    ✔ Telefonni qayta yoqing
+  </div>
+</div>
 
-    // ——— Boot ———
-    function renderSuggestionsBoot(){
-      const base = ["Qotib ishlayapti","Zaryad olmayapti","Ekran sinib qolgan","SIM ko'rmayapti","Wi‑Fi uzilib qoladi","Kamera xira"];
-      suggWrap.innerHTML = base.map(s=>`<span class=\"chip\" onclick=\"setIssue('${s}')\">${s}<\/span>`).join('');
-    }
-(function boot(){
-    initBrands();
-    updateModels();
-    renderHistory();
-    renderSuggestionsBoot();
-})();
+<div class='guide-card'>
+  <div class='guide-title'>📶 SIM karta o‘qilmayapti</div>
+  <div class='guide-desc'>
+    Sabablari:
+    <br>• SIM kontakti ifloslangan yoki oksidlangan  
+    <br>• Tray egilgan yoki buzilgan  
+    <br>• Baseband (tarmoq chipi) nosoz  
+    <br><br>
+    ✔ SIMni boshqa telefonda sinab ko‘ring  
+    ✔ *#06# orqali IMEI ni tekshiring  
+    ✔ IMEI null bo‘lsa — ustaxona shart
+  </div>
+</div>
 
-  </script>
+<div class='guide-card'>
+  <div class='guide-title'>🐌 Telefon qotmoqda yoki sekinlashmoqda</div>
+  <div class='guide-desc'>
+    Sabablari:
+    <br>• Xotira to‘lgan  
+    <br>• Orqa fonda 10+ ilova ochiq  
+    <br>• Qurilma eskirgan  
+    <br>• Virusli ilova  
+    <br><br>
+    ✔ Keraksiz ilovalarni o‘chiring  
+    ✔ RAM bo‘shating  
+    ✔ 2 yillik telefonlarda reset juda yaxshi yordam beradi
+  </div>
+</div>
+
+<div class='guide-card'>
+  <div class='guide-title'>📸 Kamera xiralashgan / fokus ishlamayapti</div>
+  <div class='guide-desc'>
+    Asosiy sabablari:
+    <br>• Kamera oynasi ifloslangan  
+    <br>• Linza ichiga chang yoki namlik kirgan  
+    <br>• Stabilizator (OIS) nosoz  
+    <br><br>
+    ✔ Mikrofiber bilan tozalang  
+    ✔ Tashqi linza shikastlangan bo‘lsa — modulni almashtirish shart
+  </div>
+</div>
+
+<div class='guide-card'>
+  <div class='guide-title'>🔈 Ovoz past chiqmoqda yoki chiqmayapti</div>
+  <div class='guide-desc'>
+    Ovoz tizimi nosozligi:
+    <br>• Dinamik panjarasi chang bilan to‘lgan  
+    <br>• Audio IC chip ishdan chiqqan  
+    <br>• Suv yoki namlik dinamik ichiga kirgan  
+    <br><br>
+    ✔ Tish cho‘tka bilan panjarani sekin tozalang  
+    ✔ Havo balonchasi bilan changni chiqarish mumkin  
+    ✔ Audio IC nosoz bo‘lsa — chipni almashtirish kerak
+  </div>
+</div>
+
+<div class='guide-card'>
+  <div class='guide-title'>⚡ Telefon zaryad olmayapti</div>
+  <div class='guide-desc'>
+    Sabablari:
+    <br>• Port ichida chang bor  
+    <br>• Kabel yomon  
+    <br>• Quvvat chipi nosoz (Charging IC)  
+    <br><br>
+    ✔ Portni ehtiyotkorlik bilan tozalang  
+    ✔ Original kabeldan foydalaning  
+    ✔ Agar zaryad foizi o‘zgarib-o‘zgarib tursa — Charging IC ishdan chiqqan bo‘lishi mumkin
+  </div>
+</div>
+
+<div class='guide-card'>
+  <div class='guide-title'>💧 Telefon suvga tushgan</div>
+  <div class='guide-desc'>
+    Suv ta’siri oqibatlari:
+    <br>• Charging port oksidlanadi  
+    <br>• Kamera ichiga bug‘ tushadi  
+    <br>• Plataning qisqa tutashi  
+    <br><br>
+    ✔ Xato: Fen bilan isitish — qat’iyan mumkin emas!  
+    ✔ Telefonni darhol o‘chiring  
+    ✔ Ichini ochib quritish uchun servisga boring
+  </div>
+</div>
+
+<div class='guide-card'>
+  <div class='guide-title'>📁 Xotira to‘lib ketgan</div>
+  <div class='guide-desc'>
+    Xotira yetishmasa telefon sekinlashadi va ilovalar ochilmaydi.
+    <br><br>
+    ✔ Galereyani tozalang  
+    ✔ Keraksiz ilovalarni o‘chiring  
+    ✔ Keshni tozalang  
+    ✔ Bulutga (Google Drive / iCloud) yuklang
+  </div>
+</div>
+
+<div class='guide-card'>
+  <div class='guide-title'>📡 Wi-Fi yoki internet ishlamayapti</div>
+  <div class='guide-desc'>
+    Sabablari:
+    <br>• Router bilan muammo  
+    <br>• Telefon Wi-Fi modulida xato  
+    <br>• DNS sozlamasi buzilgan  
+    <br><br>
+    ✔ Wi-Fi ni o‘chiring, qayta yoqing  
+    ✔ Routerni restart qiling  
+    ✔ Muammo davom etsa — WiFi chipni diagnostika qilish kerak
+  </div>
+</div>
+
+<div class='guide-card'>
+  <div class='guide-title'>🔐 Parol / Face ID / Touch ID ishlamayapti</div>
+  <div class='guide-desc'>
+    IOS va Android’da biometrik muammolar:
+    <br>• Sensor ishdan chiqqan  
+    <br>• Kamera ifloslangan  
+    <br>• Face ID lazeri ishlamayapti  
+    <br><br>
+    ✔ Sensorni tozalang  
+    ✔ Ekran haqiqiy bo‘lmasa — Face ID ishlamaydi  
+    ✔ iPhone’da Face ID moduli almashtirilmaydi — faqat servis kalibrovkasi yordam beradi
+  </div>
+</div>
+
+<div class='guide-card'>
+  <div class='guide-title'>📞 Qo‘ng‘iroq paytida ekran o‘chmayapti</div>
+  <div class='guide-desc'>
+    Sababi: Proximity sensor ishlamayapti.
+    <br><br>
+    ✔ Ekran himoya plyonkasi juda qalin  
+    ✔ Ekran moduli original emas  
+    ✔ Sensor changlangan  
+  </div>
+</div>
+
+<div class='guide-card'>
+  <div class='guide-title'>🎮 O‘yinlarda FPS tushib ketmoqda</div>
+  <div class='guide-desc'>
+    Sababi:
+    <br>• Telefon qizigan  
+    <br>• RAM yetishmayapti  
+    <br>• Processor throttling qilmoqda  
+    <br><br>
+    ✔ Grafikani pasaytiring  
+    ✔ Sovishiga imkon bering  
+    ✔ Battery saver rejimini o‘chiring
+  </div>
+</div>
+
+<div class='guide-card'>
+  <div class='guide-title'>🔊 Mikrafon ishlamayapti</div>
+  <div class='guide-desc'>
+    Sabablari:
+    <br>• Mikrofon teshigi changlangan  
+    <br>• Suv ta’siridan oksidlashgan  
+    <br>• Audio IC nosoz  
+    <br><br>
+    ✔ Yengil tozalang  
+    ✔ Agar ovoz yozishda shovqin bo‘lsa — chipni almashtirish shart
+  </div>
+</div>
+
+<div class='guide-card'>
+  <div class='guide-title'>🧊 Telefon o‘zi-o‘zidan o‘chib yoqilyapti</div>
+  <div class='guide-desc'>
+    Bu “restart loop” deyiladi.
+    <br>• Batareya kontaktida muammo  
+    <br>• Program xatolik  
+    <br>• CPU overheating  
+    <br>• Power IC nosoz  
+    <br><br>
+    ✔ Yangilanishni tekshiring  
+    ✔ Ustaxonada diagnostika qilish tavsiya qilinadi
+  </div>
+</div>
+
+<div class='guide-card'>
+  <div class='guide-title'>⚙️ Dasturiy xatolar ko‘paygan</div>
+  <div class='guide-desc'>
+    Sabablari:
+    <br>• Yangilanmagan operatsion tizim  
+    <br>• Keraksiz ilovalar to‘lib ketgan  
+    <br>• Virusli APK  
+    <br><br>
+    ✔ Reset (fabrik sozlash) ko‘pchilik muammolarni hal qiladi  
+    ✔ Ilovalarni faqat Play Market / App Store’dan yuklang
+  </div>
+</div>
+
+`;
+
+/* ===========================================
+   CARE CONTENT
+=========================================== */
+document.getElementById("care-page").innerHTML=`
+<div class='guide-card'>
+  <div class='guide-title'>🧼 1. Telefonni muntazam tozalab turing</div>
+  <div class='guide-desc'>
+    Kamera oynasi, dinamik panjarasi va sensor yuzasini haftada bir marta mikrofiber latta bilan tozalang. 
+    Chang va kir qurilmaning ishlashiga to‘sqinlik qilishi mumkin.
+  </div>
+</div>
+
+<div class='guide-card'>
+  <div class='guide-title'>🔋 2. Batareyani to‘g‘ri zaryadlang</div>
+  <div class='guide-desc'>
+    Batareyani 20%–80% oralig‘ida ushlang.  
+    Bu batareya umrini 2 baravar uzaytiradi. 100% ga to‘ldirib qo‘yish — eskirishni tezlashtiradi.
+  </div>
+</div>
+
+<div class='guide-card'>
+  <div class='guide-title'>❄️ 3. Telefonni qizitib qo‘ymang</div>
+  <div class='guide-desc'>
+    To‘shak, yostiq ostida quvvatlamang. Quyosh tagida uzoq turishi prosessor va batareyaga zarar yetkazadi. 
+    Issiqlik — elektronikaning eng katta dushmani.
+  </div>
+</div>
+
+<div class='guide-card'>
+  <div class='guide-title'>⚙️ 4. Har oy keshni tozalang</div>
+  <div class='guide-desc'>
+    Ortiqcha kesh telefonni sekinlashtiradi. Telegram, Instagram va browserlarda keshni tozalash qurilmaning 
+    tezligini tiklaydi.
+  </div>
+</div>
+
+<div class='guide-card'>
+  <div class='guide-title'>🛡️ 5. Himoya plyonka va chexdan foydalaning</div>
+  <div class='guide-desc'>
+    Ekran plyonkasi (tempered glass) singishning 80% ini oldini oladi.  
+    Yaxshi chex tushib ketishlardagi zarbani kamaytiradi.
+  </div>
+</div>
+
+<div class='guide-card'>
+  <div class='guide-title'>🧲 6. Portlarga temir buyum tiqmang</div>
+  <div class='guide-desc'>
+    USB portni igna, tish cho‘tkasi bilan tozalash — kontaktlarni sindirib yuborishi mumkin.  
+    Faqat maxsus havo purkagich (air blower) bilan tozalash xavfsiz.
+  </div>
+</div>
+
+<div class='guide-card'>
+  <div class='guide-title'>🌀 7. Telefonni vaqti-vaqti bilan qayta yuklab turing</div>
+  <div class='guide-desc'>
+    Haftasiga 1 marta restart qilish — operatsion xotirani tozalaydi, fon jarayonlarini yopadi, 
+    telefonni sezilarli ravishda tezlashtiradi.
+  </div>
+</div>
+
+<div class='guide-card'>
+  <div class='guide-title'>🔌 8. Original quvvatlagich ishlating</div>
+  <div class='guide-desc'>
+    Arzon yoki sifatsiz adapter batareyani shishirib yuborishi, chiplarni kuydirishi mumkin. 
+    Sertifikatlangan zaryadlovchi ishlatish xavfsizdir.
+  </div>
+</div>
+
+<div class='guide-card'>
+  <div class='guide-title'>📶 9. Tarmoq qidirish rejimida telefonni ishlatmang</div>
+  <div class='guide-desc'>
+    Tarmoq tortmaydigan joylarda telefon signal qidirishda kuchli energiya sarflaydi. 
+    Bu batareyani tez tugatadi va qizishga olib keladi.
+  </div>
+</div>
+
+<div class='guide-card'>
+  <div class='guide-title'>📁 10. Xotirani toza ushlang</div>
+  <div class='guide-desc'>
+    Xotira 90% dan oshib ketsa telefon sezilarli sekinlashadi.  
+    Bulutga yuklash, keraksiz fayllarni o‘chirish — eng yaxshi yechim.
+  </div>
+</div>
+
+<div class='guide-card'>
+  <div class='guide-title'>🌧️ 11. Telefonni suvdan maksimal darajada ehtiyot qiling</div>
+  <div class='guide-desc'>
+    Hatto IP68 himoyasi bo‘lsa ham, vaqt o‘tishi bilan rezina himoya kuchsizlanadi.  
+    Suvga tushgan telefonni darhol o‘chiring va fen bilan qizitmang — bu xatodir.
+  </div>
+</div>
+
+<div class='guide-card'>
+  <div class='guide-title'>🎧 12. Quloqchin uyasini va dinamikni tozalang</div>
+  <div class='guide-desc'>
+    Dinamik panjarasi chang bilan to‘lsa, ovoz sifatiga jiddiy ta’sir qiladi.  
+    Faqqat havo balonchasi bilan tozalash tavsiya qilinadi.
+  </div>
+</div>
+
+<div class='guide-card'>
+  <div class='guide-title'>📦 13. Telefonni to‘g‘ri saqlang</div>
+  <div class='guide-desc'>
+    Uzoq vaqt ishlatmasangiz, 50% zaryadda qoldiring. To‘liq o‘chirilgan holda 0% yoki 100% zaryad bilan 
+    uzoq turishi batareyaga zarar yetkazadi.
+  </div>
+</div>
+
+<div class='guide-card'>
+  <div class='guide-title'>🔐 14. Parollardan foydalaning & xavfsizlikni oshiring</div>
+  <div class='guide-desc'>
+    Yomon niyatli ilovalar va viruslardan himoyalanish uchun — faqat rasmiy marketlardan ilova yuklang.  
+    Antivirus o‘rnatish ham foyda beradi.
+  </div>
+</div>
+
+<div class='guide-card'>
+  <div class='guide-title'>🛠️ 15. Yiliga bir marta diagnostika qildiring</div>
+  <div class='guide-desc'>
+    Servisda ichki komponentlar (batareya, termopasta, portlar, sensorlar) tekshirilsa — qat’iy nasozliklar 
+    oldi olinadi. Profilaktika — telefon umrini 3 yilgacha uzaytiradi.
+  </div>
+</div>
+
+`;
+</script>
+
 </body>
 </html>
