@@ -184,6 +184,22 @@ textarea:focus{
   box-shadow:0 6px 18px rgba(0,136,204,0.3);
 }
 
+.mic-wave{
+  margin:12px auto;
+  width:18px;
+  height:18px;
+  background:#0088cc;
+  border-radius:50%;
+  animation:pulse 1.1s infinite;
+}
+
+@keyframes pulse{
+  0%{transform:scale(1);opacity:.6}
+  50%{transform:scale(1.8);opacity:.2}
+  100%{transform:scale(1);opacity:.6}
+}
+
+
 /* ===========================================
    RESULT / GUIDE CARDS
 =========================================== */
@@ -196,6 +212,41 @@ textarea:focus{
   box-shadow:var(--shadow);
   animation:fadeUp .6s ease;
 }
+
+.result-section{
+  background:rgba(255,255,255,0.7);
+  border-radius:16px;
+  padding:16px;
+  margin-top:12px;
+  box-shadow:0 6px 18px rgba(0,0,0,0.12);
+  border:1px solid rgba(255,255,255,0.35);
+  animation:fadeUp .4s ease;
+}
+
+[data-theme="dark"] .result-section{
+  background:rgba(30,30,30,0.7);
+}
+
+.section-title{
+  font-weight:700;
+  font-size:15px;
+  margin-bottom:8px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.result-section ul{
+  padding-left:18px;
+}
+
+.result-section li{
+  margin-bottom:6px;
+  font-size:14px;
+  color:var(--text-soft);
+}
+
+
 .result-title, .guide-title{
   font-size:18px;
   font-weight:700;
@@ -227,7 +278,7 @@ textarea:focus{
   <div class="header">
     <div class="left">
       <div class="logo">🔧</div>
-      <h1>Ustaxona</h1>
+      <h1>Teleshop Ustaxona</h1>
     </div>
     <button class="theme-btn" id="themeBtn" onclick="toggleTheme()">🌙</button>
   </div>
@@ -254,6 +305,13 @@ textarea:focus{
 
   </div>
 
+  <div id="listening" style="display:none;margin-top:10px;color:#0088cc;font-weight:600;">
+    🎙 Tinglayapman... gapiring
+  </div>
+  <div id="micWave" class="mic-wave" style="display:none;"></div>
+
+
+
   <!-- PAGE — GUIDE -->
   <div class="page" id="guide-page"></div>
 
@@ -275,6 +333,8 @@ function toggleTheme(){
   document.getElementById("themeBtn").textContent=newTheme==="dark"?"☀️":"🌙";
 }
 
+
+
 /* ===========================================
    TAB SWITCH
 =========================================== */
@@ -289,18 +349,40 @@ function switchTab(tab,e){
 /* ===========================================
    SPEECH RECOGNITION (STT)
 =========================================== */
+
 function startSpeech(){
   if(!("webkitSpeechRecognition" in window)){
-    alert("Sizning qurilmangiz ovoz funksiyasini qo‘llab-quvvatlamaydi.");
+    alert("Ovoz tanish qo‘llab-quvvatlanmaydi");
     return;
   }
-  let r=new webkitSpeechRecognition();
-  r.lang="uz-UZ";
-  r.interimResults=false;
+
+  const indicator = document.getElementById("listening");
+  const micWave = document.getElementById("micWave");
+
+  const r = new webkitSpeechRecognition();
+  r.lang = "uz-UZ";
+  r.interimResults = false;
+
+  // 🎤 gapirish boshlandi
+  r.onstart = () => {
+    indicator.style.display = "block";
+    micWave.style.display = "block";
+  };
+
+  // 🛑 gapirish tugadi
+  r.onend = () => {
+    indicator.style.display = "none";
+    micWave.style.display = "none";
+  };
+
+  // 📝 natija keldi
+  r.onresult = (e) => {
+    const text = e.results[0][0].transcript;
+    document.getElementById("problemInput").value = text;
+    diagnose(); // avtomatik qidiruv
+  };
+
   r.start();
-  r.onresult=function(e){
-    document.getElementById("problemInput").value=e.results[0][0].transcript;
-  }
 }
 
 /* ===========================================
@@ -309,920 +391,1989 @@ function startSpeech(){
 const DB=[
 
 {
-keywords:["qizib","issiq","qizish"],
-title:"🔥 Telefon qizib ketmoqda",
-text:`Telefonning qizib ketishi ko‘pincha quyidagi sabablar bilan bog‘liq:
+  keywords:[
+    "qizib",
+    "qiziqayapti",
+    "qizib ketti",
+    "issiq",
+    "issib ketti",
+    "telefon qiziyapti",
+    "telefon qiziqayapti",
+    "telefon qizib ketmoqda",
+    "ekran qiziyapti",
+    "ekran qiziqayapti",
+    "telefon juda issiq",
+    "qizib ishlayapti"
+  ],
 
-🔥 **Asosiy sabablar:**
-• Fon ilovalari juda ko‘p ishlayapti  
-• O‘yinlar uzoq vaqt davomida ishlatilgan  
-• Kamera bilan 4K video yozilgan  
-• Qalin chexol havo aylanishiga to‘sqinlik qilmoqda  
-• Batareya eskirgan yoki shishgan  
-• Processor throttling qilmoqda  
+  title:"🔥 Telefon qizib ketmoqda",
 
-🛠 **Yechimlar:**
-1) Telefonni 5–10 daqiqa sovuting  
-2) Qalin chexolni vaqtincha yeching  
-3) Keraksiz ilovalarni yoping  
-4) Ekran yorqinligini pasaytiring  
-5) Telefonni qayta yoqing  
+  causes:[
+    "Orqa fonda juda ko‘p ilovalar ishlayapti",
+    "O‘yinlar yoki 4K video uzoq vaqt davomida ishlatilgan",
+    "Qalin chexol telefon ichidagi issiqlik chiqishiga to‘sqinlik qilmoqda",
+    "Batareya eskirgan yoki shishishni boshlagan",
+    "Protsessor haddan tashqari yuklama ostida ishlayapti",
+    "Telefon quyosh ostida yoki issiq joyda ishlatilgan"
+  ],
 
-⚠️ **Agar harorat 45°C+ bo‘lsa — ustaxonaga boring!**`
+  actions:[
+    "Telefonni 5–10 daqiqa ishlatmay, sovishini kuting",
+    "Qalin yoki rezina chexolni vaqtincha yechib qo‘ying",
+    "Keraksiz va ochiq ilovalarni yopib chiqing",
+    "Ekran yorqinligini pasaytiring",
+    "Telefonni qayta yoqing (restart qiling)",
+    "Agar o‘yin o‘ynayotgan bo‘lsangiz — to‘xtating"
+  ],
+
+  advice:[
+    "Telefonni yostiq, ko‘rpa yoki yopiq joyda quvvatlamang",
+    "Quyosh ostida uzoq vaqt telefon ishlatmang",
+    "Faqat original yoki sifatli zaryadlovchi ishlating",
+    "Telefonni uzoq vaqt 100% zaryadda qoldirmang",
+    "Haftasiga kamida 1 marta telefonni o‘chirib-yoqing"
+  ],
+
+  warning:
+    "Agar telefon tez-tez qizib ketsa, qo‘lni kuydiradigan darajada issiq bo‘lsa yoki harorat 45°C dan oshsa — darhol ustaxonaga murojaat qiling. Bu batareya yoki ichki chiplar uchun xavfli bo‘lishi mumkin."
 },
-
-{
-keywords:["zaryad","batareya","akum","tez tug","kam ushlab"],
-title:"🔋 Batareya juda tez tugayapti",
-text:`Batareya tez tugashi 3 asosiy sabab bilan bog‘liq:
-
-🔋 **Muammolar:**
-• Batareya eskirgan (80% health’dan past)  
-• 5G, GPS yoki hotspot energiyani yeyapti  
-• Ilovalar fon rejimda ishlayapti  
-• Ekran yorqinlik 100%  
-• Tez zaryadlash adapteri noto‘g‘ri  
-
-🛠 **Yechimlar:**
-• Keraksiz fon ilovalarini o‘chiring  
-• Ekranni 30–40% yorqinlikda ishlating  
-• Original adapterdan foydalaning  
-• Power Saving rejimini yoqing  
-
-💡 **PRO Maslahat:** Telefonni 20%–80% oralig‘ida zaryadlang — batareya umrini 2 baravar uzaytiradi.`
-},
-
-{
-keywords:["singan","yoriq","ekran","display"],
-title:"📱 Ekran singan yoki yoriq",
-text:`Ekran muammolari 2 turga bo‘linadi:
-
-🪟 **1) Faqat oynasi singan:**
-Sensor ishlaydi, ranglar to‘g‘ri — oynani almashtirish kifoya.
-
-💥 **2) Matritsa (AMOLED/LCD) shikastlangan:**
-• Chiziqlar paydo bo‘lgan  
-• Ranglar buzilgan  
-• Sensor javob bermaydi  
-
-🛠 **Yechim:**
-Ekran faqat modul bilan almashtiriladi. Yopishtirish yoki “polir” qilish yordam bermaydi.`
-},
-
-{
-keywords:["yonmay","yoqilmay","ochilmay","ishga tushmay"],
-title:"⚫ Telefon umuman yonmayapti",
-text:`Telefonning yonmasligi — jiddiy muammo.
-
-⚫ **Sabablari:**
-• Batareya umuman o‘lgan  
-• Quvvat yo‘liga suv kirgan  
-• Power IC chip kuygan  
-• On/Off tugmasi ishlamayapti  
-• Ekran butunlay ishdan chiqqan  
-
-🛠 **Tekshirish:**
-1) Quvvat tugmasini 10 sekund bosib turing  
-2) Boshqa adapter/kabel bilan quvvatlab ko‘ring  
-3) Kompyuterga ulab ko‘ring  
-
-⚠️ **Hech reaksiya bo‘lmasa — servisga borish shart.**`
-},
-
-{
-keywords:["ilova","kirmaydi","ochilmaydi","tushib","error"],
-title:"📂 Ilovalar ochilmayapti yoki ishlamayapti",
-text:`📂 Ilovalarning ishlamasligiga sabablar:
-
-• Kesh buzilgan  
-• Internet bilan bog‘liq muammo  
-• Xotira to‘lgan  
-• Telefon eskirgan  
-• Virusli APK o‘rnatilgan  
-
-🛠 **Yechim:**
-• Ilova keshini tozalang  
-• Telefonni qayta yoqing  
-• Ilovani qayta o‘rnating  
-• Xotirada kamida 2GB bo‘sh joy qoldiring`
-},
-
-{
-keywords:["sim","simk","tarmoq","oqimaydi","signal yoq"],
-title:"📶 SIM karta o‘qilmayapti",
-text:`SIM kartaning o‘qilmasligi ko‘p uchraydi.
-
-📶 **Sabablari:**
-• Tray egilgan  
-• SIM kontakti oksidlangan  
-• Baseband chip nosoz  
-• SIM noto‘g‘ri kesilgan  
-• IMEI o‘chgan (null)
-
-🛠 **Yechim:**
-• SIMni boshqa telefonda sinab ko‘ring  
-• Trayni tozalang  
-• *#06# terib IMEI ni tekshiring  
-• IMEI yo‘q bo‘lsa — Baseband tiklanishi kerak`
-},
-
-{
-keywords:["qotadi","lag","sek","sekin","tizim sekin"],
-title:"🐌 Telefon qotmoqda va juda sekin ishlamoqda",
-text:`🐌 Telefonning qotishi sabablari:
-
-• Xotira 90% dan oshgan  
-• Protsessor qizigan  
-• Virusli ilovalar o‘rnatilgan  
-• RAM etishmayapti  
-
-🛠 **Yechim:**
-• Keraksiz ilovalarni o‘chiring  
-• Keshni tozalang  
-• Telefonni restart qiling  
-• Virus tekshiruvidan o‘tkazing  
-
-💡 2–3 yillik telefonlarda *fabrik reset* juda yaxshi yordam beradi.`
-},
-
-{
-keywords:["kamera","xira","fokus","tushmaydi"],
-title:"📸 Kamera xiralashgan yoki fokus ishlamayapti",
-text:`📸 Kamera muammolari:
-
-• Kamera oynasi ifloslangan  
-• Stabilizator buzilgan  
-• Linza ostiga chang kirgan  
-• Modul suvdan zararlangan  
-
-🛠 **Yechim:**
-• Mikrofiber bilan tozalang  
-• Fokus ishlamasa — modulni almashtirish kerak  
-• Suv kirgan bo‘lsa — quritish yordam bermaydi, servis shart`
-},
-
-{
-keywords:["ovoz","dinamik","past","chiqmayapti"],
-title:"🔈 Ovoz past chiqmoqda yoki umuman chiqmayapti",
-text:`🔈 Dinamik muammolari:
-
-• Chang bilan to‘lib qolgan  
-• Suv kirgan  
-• Audio IC nosoz  
-• Panjara ifloslangan  
-
-🛠 **Yechim:**
-• Havo balonchasi bilan tozalang  
-• Quloqchin orqali ovoz chiqsa — dinamik buzilgan  
-• Audio IC buzilgan bo‘lsa — chipni almashtirish kerak`
-},
-
-{
-keywords:["zaryad olmaydi","quvvat olmaydi","charging"],
-title:"⚡ Telefon zaryad olmayapti",
-text:`⚡ Sabablari:
-
-• Port ichida chang  
-• Kabel nosoz  
-• Zaryadlash chipi kuygan  
-• Suv ta’siri  
-
-🛠 **Yechim:**
-• Portni tish qurtlari yoki igna bilan emas — faqat air blower bilan tozalang  
-• Original kabeldan foydalaning  
-• Zaryad foizi sakrab tursa — Charging IC nosoz`
-},
-
-{
-keywords:["suv","suvga tushgan","namlik","ho‘l"],
-title:"💧 Telefon suvga tushgan",
-text:`💧 Suv telefoni eng xavfli raqibi.
-
-❌ FEN bilan quritish — zararli!  
-❌ Quvvatga ulash — xavfli!
-
-🛠 **To‘g‘ri yo‘l:**
-1) Darhol o‘chirib qo‘ying  
-2) SIM + chexolni chiqarib qo‘ying  
-3) Quritishga qo‘ymang  
-4) Ustaxonaga olib boring  
-
-Suv oksidlanishni boshlaydi — bu qisqa tutashuvga olib keladi.`
-},
-
-{
-keywords:["xotira","joy yo‘q","tolgan","memory full"],
-title:"📁 Xotira to‘lib ketgan",
-text:`📁 Xotiraning to‘lishi:
-
-• Telefon sekin ishlaydi  
-• Kamera rasm olmaydi  
-• Ilovalar o‘chib ketadi  
-
-🛠 **Yechim:**
-• Galereyani tozalang  
-• Telegram keshini tozalang  
-• Bulutga yuklab qo‘ying (Google Drive, iCloud)`
-},
-
-{
-keywords:["wifi","internet","tarmoq muammo"],
-title:"📡 Wi-Fi yoki internet ishlamayapti",
-text:`📡 Sabablari:
-
-• Router muammosi  
-• DNS xatolari  
-• Wi-Fi modul ishdan chiqqan  
-
-🛠 **Yechim:**
-• WiFi-ni o‘chirib-yoqing  
-• Routerni restart qiling  
-• Boshqa tarmoqqa ulab ko‘ring`
-},
-
-{
-keywords:["face id","touch id","barmoq","sensor"],
-title:"🔐 Face ID / Touch ID ishlamayapti",
-text:`Biometrik tizimlar juda nozik.
-
-🛠 **Sabablari:**
-• Ekran original emas  
-• Kamera to‘silgan  
-• Sensor ifloslangan  
-• Face ID lazeri buzilgan  
-
-⚠️ iPhone Face ID moduli boshqa korpusga o‘tmaydi — servisga murojaat qilish shart.`
-},
-
-{
-keywords:["proximity","ekran o‘chmaydi","qo‘ng‘iroq"],
-title:"📞 Qo‘ng‘iroq paytida ekran o‘chmayapti",
-text:`📞 Sabablari:
-
-• Proximity sensor ishlamayapti  
-• Ekran himoyasi juda qalin  
-• Ekran original emas  
-
-🛠 **Yechim:**
-• Himoya plyonkasini almashtiring  
-• Sensor sohasini tozalang`
-},
-
-{
-keywords:["fps","oyin","lag","frame"],
-title:"🎮 O‘yinlarda FPS tushib ketmoqda",
-text:`🎮 FPS pasayish sabablari:
-
-• Telefon qizigan  
-• Grafik sozlamalar yuqori  
-• RAM yetarli emas  
-
-🛠 **Yechim:**
-• Grafikani pasaytiring  
-• Telefonni sovuting  
-• Fon ilovalarni yoping`
-},
-
-{
-keywords:["mikrofon","ovoz yozmaydi"],
-title:"🎤 Mikrofon ishlamayapti",
-text:`🎤 Sabablari:
-
-• Mikrofon teshigi changlangan  
-• Suv kirgan  
-• Audio IC buzilgan  
-
-🛠 **Yechim:**
-• Teshikni ehtiyotkorlik bilan tozalang  
-• Ovoz yozib sinab ko‘ring  
-• Yaxshilanmasa — chipni almashtirish kerak`
-},
-
-{
-keywords:["restart","o‘zi o‘chadi","o‘zi yonadi"],
-title:"🔁 Telefon o‘zi-o‘zidan qayta ishga tushmoqda",
-text:`🔁 Restart loop sabablar:
-
-• Batareya kontaktida muammo  
-• CPU haddan tashqari qizish  
-• System fayllari buzilgan  
-
-🛠 Yechim:
-• Yangilanishni o‘rnating  
-• Zaxira qilib, reset qiling  
-• Ustaxonada diagnostikadan o‘tkazing`
-},
-
-{
-keywords:["virus","reklama","spam","apk"],
-title:"🦠 Telefon virusga chalindi",
-text:`🦠 Virus belgilari:
-
-• O‘zi ilova ochiladi  
-• Reklamalar chiqaveradi  
-• Telefon qotadi  
-
-🛠 Yechim:
-• Antivirus o‘rnating  
-• Noma’lum APKlarni o‘chirib tashlang  
-• Brauzer keshini tozalang`
-},
-
-{
-keywords:["bluetooth","ulanish","pair","device"],
-title:"🔵 Bluetooth ulanmayapti",
-text:`🔵 Sabablari:
-
-• Qurilma oldin boshqa telefon bilan juftlangan  
-• Versiya mos emas  
-• Bluetooth drayver xatosi  
-
-🛠 **Yechim:**
-• Bluetoothni 10 sekundga o‘chirib qo‘ying  
-• “Forget device” ni bosing  
-• Qayta ulab ko‘ring`
-},
-
-{
-keywords:["kamera qop qora","kamera ishlamaydi"],
-title:"📷 Kamera ochilmayapti (qora ekran)",
-text:`📷 Kamera ochilganda qora ekran chiqsa:
-
-• Kamera moduliga quvvat yetmayapti  
-• Kamera shleyfi uzilgan  
-• Ilova ruxsatlari o‘chirilgan  
-
-🛠 **Yechim:**
-• Sozlamalardan kamera ruxsatini yoqing  
-• Telefonni qayta yoqing  
-• Modulni tekshirtiring`
-},
-
-{
-keywords:["speaker","dinamik","musiqa past"],
-title:"🔊 Musiqa ovozi past chiqmoqda",
-text:`🔊 Sabablari:
-
-• Dinamik changlangan  
-• Suv ta’siri  
-• Audio equalizer noto‘g‘ri  
-
-🛠 Yechim:
-• Panjarani yengil tozalang  
-• Equalizer-ni tekshiring  
-• Suv kirgan bo‘lsa — quritish emas, servisga olib boring`
-},
-
-{
-keywords:["type c","port","usb ishlamaydi"],
-title:"🔌 USB / Type-C port ishlamayapti",
-text:`🔌 Sabablari:
-
-• Port ichida chang  
-• Kontakt oksidlashgan  
-• Port shikastlangan  
-
-🛠 Yechim:
-• Air blower bilan tozalang  
-• Zaryadlovchini tekshiring  
-• Portni almashtirish kerak bo‘lishi mumkin`
-},
-
-{
-keywords:["sensor","sensor ishlamaydi","touch"],
-title:"🖐️ Sensor ishlamayapti",
-text:`🖐️ Sensor muammosi:
-
-• Ekran original emas  
-• Sensor shikastlangan  
-• Suv kirgan  
-
-🛠 Yechim:
-• Ekranni tekshirtiring  
-• Himoya plyonkasi sensorli bo‘lmagan bo‘lishi mumkin`
-},
-
-{
-keywords:["galereya","rasm ochilmaydi","media"],
-title:"🖼️ Galereya rasm ochmayapti",
-text:`Sabablari:
-
-• Media fayllar buzilgan  
-• Xotira to‘lib ketgan  
-• Galereya keshida xato  
-
-🛠 Yechim:
-• Keshni tozalang  
-• Storage-ni bo‘shating`
-},
-
-{
-keywords:["bildirishnomalar","notification","kelmaydi"],
-title:"🔔 Bildirishnomalar kelmayapti",
-text:`🔔 Sabablar:
-
-• Notification o‘chirilgan  
-• Energiyani tejash rejimi  
-• Internet beqaror  
-
-🛠 Yechim:
-• Ilova ruxsatlarini yoqing  
-• Power Saving rejimini o‘chiring`
-},
-
-{
-keywords:["yuklanmayapti","apps yuklanmaydi","market ishlamaydi"],
-title:"⬇️ Ilovalar yuklanmayapti (Play Market / App Store)",
-text:`⬇️ Sabablar:
-
-• Internet sekin  
-• Xotira yetarli emas  
-• Market keshida xato  
-
-🛠 Yechim:
-• Market keshini tozalang  
-• Telefonni qayta yoqing  
-• Xotiradan joy bo‘shating`
-},
-
-{
-keywords:["qizil chiroq","batareya error","charging problem"],
-title:"🔴 Qizil chiroq yonib turibdi",
-text:`Bu batareya chuqur zaryadsiz holatda degani.
-
-🛠 Yechim:
-• Original adapter bilan 20 daqiqa quvvatlab ko‘ring  
-• Qizil chiroq o‘chmasa — batareya o‘lgan`
-},
-
-{
-keywords:["vibratsiya","vibro","titramayapti"],
-title:"📳 Vibratsiya ishlamayapti",
-text:`📳 Vibratsiya muammosi:
-
-• Vibramotor buzilgan  
-• Sistem sozlamasi o‘chirilgan  
-
-🛠 Yechim:
-• Sozlamalardan vibratsiyani yoqing  
-• Modulni tekshirtiring`
-},
-
-{
-keywords:["sovuqda o'chadi","sovuq","cold"],
-title:"❄️ Sovuqda telefon o‘chib qoladi",
-text:`❄️ Sovuq batareyaga kuchli ta’sir qiladi.
-
-🛠 Yechim:
-• Sovuqda quvvat past bo‘lsa ishlatmay turing  
-• Telefonni ichki kiyim cho‘ntagida olib yuring  
-• Batareya eskirgan bo‘lishi mumkin`
-},
-
-
 
 
 {
-keywords:["kamera aylanyapti","kamera ochilmayapti","loading camera"],
-title:"🔄 Kamera “Aylanmoqda” holatida qolib ketmoqda",
-text:`📷 Kamera ochilmay, faqat aylanadigan indikator chiqsa:
+  keywords:[
+    "batareya tez tugayapti",
+    "zaryad tez ketayapti",
+    "zaryad ushlamayapti",
+    "akum tez tugayapti",
+    "telefon tez o‘chayapti",
+    "foiz tez kamayapti",
+    "batareya kam ushlayapti"
+  ],
 
-🔧 Sabablari:
-• Kamera moduliga quvvat yetmayapti  
-• Kamera ilovasi buzilgan  
-• Stabilizator motorida nosozlik  
-• Kamera moduli boshqa ilovada band  
+  title:"🔋 Batareya juda tez tugayapti",
 
-🛠 Yechim:
-1) Barcha ilovalarni yoping  
-2) Telefonni qayta yoqing  
-3) Kamera ruxsatlarini tekshiring  
-4) Agar hali ham ochilmasa — modulni almashtirish kerak`
+  causes:[
+    "Batareya eskirgan yoki sig‘imi pasaygan",
+    "Orqa fonda ilovalar doimiy ishlayapti",
+    "GPS, Bluetooth yoki Hotspot yoqilgan",
+    "Ekran yorqinligi juda baland",
+    "Telefon qizib ishlayapti",
+    "Noto‘g‘ri yoki sifatsiz zaryadlovchi ishlatilmoqda"
+  ],
+
+  actions:[
+    "Keraksiz ilovalarni yopib chiqing",
+    "GPS, Bluetooth va Hotspotni o‘chiring",
+    "Ekran yorqinligini pasaytiring",
+    "Telefonni qayta yoqing",
+    "Power Saving (energiya tejash) rejimini yoqing"
+  ],
+
+  advice:[
+    "Telefonni 20%–80% oralig‘ida zaryadlang",
+    "Faqat original yoki sifatli adapter ishlating",
+    "Telefonni tun bo‘yi zaryadda qoldirmang",
+    "Qizib ketayotgan paytda quvvatlamang"
+  ],
+
+  warning:
+    "Agar batareya 1–2 soatda bo‘shab qolsa yoki telefon o‘z-o‘zidan o‘chib qolsa — batareyani almashtirish uchun ustaxonaga murojaat qiling."
 },
 
 {
-keywords:["kuchli tebranish","shovqin","g‘alati ovoz"],
-title:"📡 Telefon ichidan g‘alati shovqin chiqmoqda",
-text:`📡 Agar ichidan “g‘izillash”, “shitirlash” yoki g‘alati ovoz chiqsa:
+  keywords:[
+    "ekran singan",
+    "ekran yorilgan",
+    "sensor ishlamayapti",
+    "ekran bosilmayapti",
+    "ekran sinib qolgan",
+    "displey ishlamayapti",
+    "touch ishlamayapti"
+  ],
 
-🔧 Sabablari:
-• Vibramotor shikastlangan  
-• Korpus ichida bo‘sh vint  
-• Dinamik membranasi yirtilgan  
-• Suv ta’siri  
+  title:"📱 Ekran singan yoki sensor ishlamayapti",
 
-🛠 Yechim:
-• Ustaxona diagnostikasi shart — ichki mexanik muammo bor.`
+  causes:[
+    "Telefon tushib ketgan yoki zarba olgan",
+    "Ekran oynasi yorilgan",
+    "Sensor qatlam shikastlangan",
+    "Suv yoki namlik kirgan",
+    "Oldin arzon yoki sifatli bo‘lmagan ekran o‘rnatilgan"
+  ],
+
+  actions:[
+    "Telefonni qayta yoqib ko‘ring",
+    "Himoya plyonkasi bo‘lsa olib tashlab sinab ko‘ring",
+    "Sensor faqat bir joyda ishlamasa — vaqtincha ishlatmaslikka harakat qiling"
+  ],
+
+  advice:[
+    "Telefonni har doim himoya chex va oynacha bilan ishlating",
+    "Tushib ketganidan keyin kuch bilan bosmang",
+    "Sensor ishlamayotgan telefonni zaryadga ulab ishlatmang"
+  ],
+
+  warning:
+    "Agar sensor javob bermasa yoki ekranda chiziqlar paydo bo‘lgan bo‘lsa — ekran modulini almashtirish uchun ustaxonaga murojaat qiling."
 },
 
 {
-keywords:["kmd sd","sd card","sd o‘qimaydi"],
-title:"💾 SD-karta o‘qilmayapti",
-text:`💾 SD-karta muammosi:
+  keywords:[
+    "zaryad olmayapti",
+    "quvvat olmayapti",
+    "telefon zaryad olmadi",
+    "charging yo‘q",
+    "zaryad foizi oshmayapti",
+    "simga ulasam ham zaryad olmaydi"
+  ],
 
-🔧 Sabablari:
-• SD format mos emas  
-• Slot changlangan  
-• SD karta buzilgan  
-• Kontaktlar oksidlangan  
+  title:"⚡ Telefon zaryad olmayapti",
 
-🛠 Yechim:
-• SD kartani kompyuterda FAT32 yoki exFAT formatiga o‘tkazing  
-• Slotni havo balonchasi bilan tozalang  
-• Boshqa SD bilan sinab ko‘ring`
+  causes:[
+    "Zaryadlash porti ichiga chang yoki kir to‘plangan",
+    "Zaryadlovchi kabel buzilgan",
+    "Adapter nosoz yoki sifatsiz",
+    "Zaryadlash chipi (Charging IC) ishdan chiqqan",
+    "Telefon suv ta’sirida qolgan"
+  ],
+
+  actions:[
+    "Boshqa kabel va adapter bilan sinab ko‘ring",
+    "Telefonni qayta yoqing",
+    "Zaryad portini ehtiyotkorlik bilan tozalang (havo bilan)",
+    "Telefonni sovitib keyin zaryadlab ko‘ring"
+  ],
+
+  advice:[
+    "Zaryad portiga igna yoki temir buyum tiqmang",
+    "Faqat original yoki sertifikatlangan kabel ishlating",
+    "Telefonni nam joyda quvvatlamang"
+  ],
+
+  warning:
+    "Agar telefon umuman zaryad olmayotgan bo‘lsa yoki foiz sakrab tursa — ustaxonada zaryadlash chipini tekshirtirish shart."
 },
 
 {
-keywords:["rashka","yashil ekran","display green"],
-title:"🟩 Ekran yashil yoki binafsha rangga kirib qoldi",
-text:`🟩 AMOLED ekran muammosi:
+  keywords:[
+    "telefon qotayapti",
+    "telefon sekin",
+    "lag bo‘layapti",
+    "sekin ishlayapti",
+    "qotib qolayapti",
+    "osilib qolayapti"
+  ],
 
-🔧 Sabablari:
-• OLED matritsa yonishi (burn-in)  
-• Ekran shikastlangan  
-• Video driver nosoz  
+  title:"🐌 Telefon qotmoqda yoki sekin ishlayapti",
 
-🛠 Yechim:
-• Ranglar doimiy o‘zgargan bo‘lsa — modulni almashtirish kerak  
-• Burn-in bo‘lsa maxsus filtr ilovalar vaqtinchalik yordam beradi`
+  causes:[
+    "Xotira juda to‘lib ketgan",
+    "Orqa fonda juda ko‘p ilovalar ochiq",
+    "Telefon uzoq vaqtdan beri o‘chirilmagan",
+    "Virusli yoki zararli ilovalar o‘rnatilgan",
+    "Qurilma eski yoki RAM yetishmaydi"
+  ],
+
+  actions:[
+    "Keraksiz ilovalarni o‘chiring",
+    "Keshni tozalang",
+    "Telefonni qayta yoqing",
+    "Xotirada kamida 2–3 GB bo‘sh joy qoldiring"
+  ],
+
+  advice:[
+    "Haftasiga kamida 1 marta telefonni restart qiling",
+    "Noma’lum APK ilovalarni o‘rnatmang",
+    "Ilovalarni doim yangilab boring"
+  ],
+
+  warning:
+    "Agar telefon doimiy qotib qolsa va ochilmay qolsa — ustaxonada diagnostika yoki reset talab qilinadi."
 },
 
 {
-keywords:["notification lag","kech keladi","kechikish"],
-title:"⏱️ Bildirishnomalar juda kech kelmoqda",
-text:`⏱️ Kechikish sabablari:
+  keywords:[
+    "internet ishlamayapti",
+    "tarmoq yo‘q",
+    "sim karta o‘qimayapti",
+    "signal yo‘q",
+    "wifi ishlamayapti",
+    "mobil internet yo‘q"
+  ],
 
-• Battery Saver rejimi  
-• Qurilma background ishlashiga ruxsat bermagan  
-• Internet uyqu rejimiga o‘tmoqda  
+  title:"📶 Internet yoki SIM karta ishlamayapti",
 
-🛠 Yechim:
-• Ilovalar uchun “Background activity” ni yoqing  
-• Power Saving rejimini o‘chiring  
-• WiFi optimize funksiyasini o‘chiring`
+  causes:[
+    "SIM karta noto‘g‘ri joylashtirilgan",
+    "SIM kontaktlari ifloslangan",
+    "Operator tomondan vaqtinchalik muammo",
+    "Telefon tarmoq sozlamalari buzilgan",
+    "Baseband yoki antenna nosozligi"
+  ],
+
+  actions:[
+    "Telefonni qayta yoqing",
+    "SIM kartani olib qayta joylashtiring",
+    "Airplane mode ni yoqib o‘chiring",
+    "Boshqa joyda signalni tekshirib ko‘ring"
+  ],
+
+  advice:[
+    "SIM kartani kesib ishlatmang",
+    "Telefonni suvdan ehtiyot qiling",
+    "Tarmoq sozlamalarini o‘zboshimchalik bilan o‘zgartirmang"
+  ],
+
+  warning:
+    "Agar SIM umuman o‘qilmasa yoki IMEI yo‘q bo‘lsa — ustaxonaga murojaat qilish shart."
 },
 
 {
-keywords:["qulf","bloklandi","ekran paroli","eslab"],
-title:"🔐 Parol esdan chiqdi (Ekran qulfidan o‘tolmayapti)",
-text:`🔐 Parol esdan chiqishi — keng tarqalgan muammo.
+  keywords:[
+    "kamera ishlamayapti",
+    "kamera ochilmayapti",
+    "kamera xira",
+    "rasm xira chiqyapti",
+    "kamera fokus qilmayapti",
+    "kamera qora ekran",
+    "selfi kamera ishlamayapti"
+  ],
 
-🛠 Android:
-• Google hisob bilan tiklash mumkin  
-• Ba’zan reset talab qilinadi (ma’lumotlar o‘chadi)
+  title:"📸 Kamera ishlamayapti yoki xira chiqyapti",
 
-🛠 iPhone:
-• DFU Rejimida tiklash kerak  
-• iCloud orqali o‘chirib tiklash mumkin
+  causes:[
+    "Kamera oynasi ifloslangan yoki tirnalgan",
+    "Fokus mexanizmi nosoz",
+    "Linza ichiga chang yoki namlik kirgan",
+    "Kamera moduliga quvvat yetmayapti",
+    "Kamera ilovasi xatolik bilan ishlayapti"
+  ],
 
-⚠️ Qulfni buzishning noqonuniy usullari mavjud emas.`
+  actions:[
+    "Kamera oynasini mikrofiber latta bilan tozalang",
+    "Telefonni qayta yoqing",
+    "Kamera ruxsatlarini sozlamalardan tekshiring",
+    "Boshqa kamera ilovasi bilan sinab ko‘ring"
+  ],
+
+  advice:[
+    "Kamera oynasini qattiq buyum bilan artmang",
+    "Telefonni suv va namlikdan ehtiyot qiling",
+    "Telefonni tushirib yubormaslikka harakat qiling"
+  ],
+
+  warning:
+    "Agar kamera umuman ochilmasa yoki doim xira chiqsa — kamera modulini tekshirtirish uchun ustaxonaga murojaat qiling."
 },
 
 {
-keywords:["lag keyboard","klaviatura sekin","yozishda qotadi"],
-title:"⌨️ Klaviatura kechikib yozmoqda",
-text:`⌨️ Sabablari:
+  keywords:[
+    "ovoz chiqmayapti",
+    "dinamik ishlamayapti",
+    "ovoz juda past",
+    "musiqa eshitilmayapti",
+    "qo'ng'iroqda ovoz yo'q",
+    "telefon ovozi past"
+  ],
 
-• RAM to‘lgan  
-• Kesh buzilgan  
-• Klaviatura ilovasi eskirgan  
+  title:"🔊 Ovoz chiqmayapti yoki juda past",
 
-🛠 Yechim:
-• Klaviatura keshini tozalang  
-• Telefonni restart qiling  
-• Gboard yoki Samsung Keyboard-ni yangilang`
+  causes:[
+    "Dinamik panjarasi chang bilan to'lib qolgan",
+    "Suv yoki namlik dinamik ichiga kirgan",
+    "Audio chip (Audio IC) nosoz",
+    "Telefon ovoz sozlamalari pasaytirilgan",
+    "Quloqchin rejimi yoqilib qolgan"
+  ],
+
+  actions:[
+    "Ovoz balandligini tekshiring",
+    "Telefonni qayta yoqing",
+    "Quloqchin ulab-olib ko‘ring",
+    "Dinamik panjarasini havo bilan tozalang"
+  ],
+
+  advice:[
+    "Telefonni suvga yaqin joyda ishlatmang",
+    "Ovoz balandligini doim maksimalda ishlatmang",
+    "Arzon quloqchinlardan ehtiyot bo‘ling"
+  ],
+
+  warning:
+    "Agar quloqchin orqali ovoz chiqib, dinamikdan chiqmasa — dinamik yoki audio chipni ustaxonada tekshirtirish kerak."
 },
 
 {
-keywords:["hotspot","tethering ishlamaydi"],
-title:"📶 Hotspot ishlamayapti yoki ulana olmayapti",
-text:`📶 Sabablari:
+  keywords:[
+    "mikrofon ishlamayapti",
+    "ovoz yozilmayapti",
+    "gapirganim eshitilmayapti",
+    "qo'ng'iroqda ovozim chiqmayapti",
+    "audio yozilmaydi"
+  ],
 
-• Operator hotspotni cheklagan  
-• Tarmoq sozlamalari buzilgan  
-• DNS muammosi  
+  title:"🎤 Mikrofon ishlamayapti",
 
-🛠 Yechim:
-• APN sozlamalarini tiklang  
-• Hotspot nomi va parolini o‘zgartiring  
-• Telefonni qayta yoqing`
+  causes:[
+    "Mikrofon teshigi chang yoki kir bilan to‘lib qolgan",
+    "Suv yoki namlik kirgan",
+    "Audio chip nosoz",
+    "Mikrofon ruxsatlari o‘chirilgan"
+  ],
+
+  actions:[
+    "Mikrofon teshigini ehtiyotkorlik bilan tozalang",
+    "Telefonni qayta yoqing",
+    "Ovoz yozib sinab ko‘ring",
+    "Ilova ruxsatlarini tekshiring"
+  ],
+
+  advice:[
+    "Telefonni yomg‘irda ochiq ishlatmang",
+    "Mikrofon joyini yopib gapirmang",
+    "Telefonni suvdan maksimal darajada ehtiyot qiling"
+  ],
+
+  warning:
+    "Agar umuman ovoz yozilmasa yoki qo‘ng‘iroqda ovozingiz eshitilmasa — audio chipni tekshirtirish uchun ustaxonaga murojaat qiling."
 },
 
 {
-keywords:["kuchli vibratsiya","telefon titrayapti"],
-title:"😵 Telefon o‘z-o‘zidan tebranayapti",
-text:`😵 Muammo sabablari:
+  keywords:[
+    "telefon o'zi o'chayapti",
+    "o‘zi yoqilib o'chayapti",
+    "restart bo'layapti",
+    "telefon qayta yoqilayapti",
+    "o'zi restart"
+  ],
 
-• Ilovalardan biri notog‘ri bildirishnoma yuboryapti  
-• Vibramotor tiqilib qolgan  
-• Virusli reklama  
+  title:"🔁 Telefon o‘zi-o‘zidan o‘chib yoqilyapti",
 
-🛠 Yechim:
-• Bildirishnomalar logini tekshiring  
-• Antivirus bilan tozalang  
-• Vibramotorni servisda tekshirtiring`
+  causes:[
+    "Batareya kontaktida muammo",
+    "Telefon haddan tashqari qizib ketmoqda",
+    "Dasturiy xatolik yoki virus",
+    "Power chip nosoz",
+    "Telefon ichiga namlik kirgan"
+  ],
+
+  actions:[
+    "Telefonni sovitib ko‘ring",
+    "Keraksiz ilovalarni o‘chiring",
+    "Telefonni qayta yoqing",
+    "Yangilanishlarni tekshiring"
+  ],
+
+  advice:[
+    "Telefonni qizib ketgan holatda ishlatmang",
+    "Noma’lum ilovalarni o‘rnatmang",
+    "Telefonni suvdan ehtiyot qiling"
+  ],
+
+  warning:
+    "Agar telefon kuniga bir necha marta o‘zi o‘chib-yoqilsa — ustaxonada to‘liq diagnostika talab qilinadi."
 },
 
 {
-keywords:["charging reverse","teskari zaryad","reverse charging"],
-title:"🔄 Telefon boshqa qurilmani zaryadlab qo‘ymoqda",
-text:`Bu Wireless PowerShare funksiyasi tasodifan yoqilgan bo‘lishi mumkin.
+  keywords:[
+    "telefon suvga tushdi",
+    "telefon ho'l bo'ldi",
+    "suv kirgan",
+    "telefon nam bo'ldi",
+    "telefon ho'llandi"
+  ],
 
-🛠 Yechim:
-• Battery Settings → Wireless PowerShare → OFF  
-• Telefon qizib ketsa — funksiyani ishlatmang`
+  title:"💧 Telefon suvga tushgan",
+
+  causes:[
+    "Telefon suvga yoki suyuqlikka tushib ketgan",
+    "Yomg'irda ishlatilgan",
+    "Vannaxona yoki oshxonada namlik ta'siri"
+  ],
+
+  actions:[
+    "Telefonni darhol o'chiring",
+    "SIM karta va chexolni chiqarib oling",
+    "Telefonni quvvatga ulamang",
+    "Telefonni qimirlatmasdan quruq joyga qo'ying"
+  ],
+
+  advice:[
+    "Fen bilan quritmang",
+    "Guruch ichiga solib qo'yish ishonchli yechim emas",
+    "Telefonni iloji boricha tezroq servisga olib boring"
+  ],
+
+  warning:
+    "Suvdan keyin telefon ishlayotgandek ko'rinsa ham — ichki oksidlanish bo'lishi mumkin. Majburiy tarzda ustaxonaga murojaat qiling."
 },
 
 {
-keywords:["dark spot","qora nuqta","ekranda nuqta"],
-title:"⚫ Ekranda qora nuqta paydo bo‘lgan",
-text:`⚫ Bu — o‘lik piksel yoki AMOLEDda “burn-in”.
+  keywords:[
+    "wifi ishlamayapti",
+    "wifi ulanmayapti",
+    "internet yo'q",
+    "uy wifi yo'q",
+    "tarmoqqa ulanmayapti",
+    "wifi bor lekin internet yo'q"
+  ],
 
-🛠 Yechim:
-• Pixel refresher ilovalari vaqtincha yordam beradi  
-• Agar nuqta kattalashsa — ekran moduli almashtiriladi`
+  title:"📶 Wi-Fi ulanmayapti yoki internet yo‘q",
+
+  causes:[
+    "Router bilan vaqtinchalik muammo",
+    "Telefon Wi-Fi sozlamalari buzilgan",
+    "DNS yoki tarmoq xatoligi",
+    "Wi-Fi moduli nosoz",
+    "Telefon oldin noto‘g‘ri tarmoqqa ulangan"
+  ],
+
+  actions:[
+    "Wi-Fi ni o‘chirib, qayta yoqing",
+    "Telefonni qayta yoqing",
+    "Routerni restart qiling",
+    "Boshqa Wi-Fi tarmog‘iga ulab ko‘ring"
+  ],
+
+  advice:[
+    "Ishonchsiz Wi-Fi tarmoqlarga ulanavermang",
+    "Tarmoq sozlamalarini o‘zboshimchalik bilan o‘zgartirmang",
+    "Telefonni suvdan ehtiyot qiling (Wi-Fi modul sezgir)"
+  ],
+
+  warning:
+    "Agar birorta Wi-Fi tarmoqqa ham ulanmasa — Wi-Fi modulini tekshirtirish uchun ustaxonaga murojaat qiling."
 },
 
 {
-keywords:["light bleed","yorug‘lik sizishi","ekran chetida nur"],
-title:"🌟 Ekran chetlaridan nur chiqmoqda (Light Bleed)",
-text:`🌟 LCD ekranlarda keng tarqalgan.
+  keywords:[
+    "ilova ochilmayapti",
+    "ilova yopilib ketayapti",
+    "app ishlamayapti",
+    "programa ochilmaydi",
+    "error chiqyapti"
+  ],
 
-🛠 Sabablar:
-• Ekran ramkasi siqilgan  
-• Panel bosilgan  
-• Ishlab chiqarish nuqsoni  
+  title:"🧠 Ilovalar ochilmayapti yoki yopilib ketmoqda",
 
-🔧 Yechim:
-• Light bleedni to‘liq yo‘qotib bo‘lmaydi  
-• Kuchli bo‘lsa — modulni almashtirish kerak`
+  causes:[
+    "Ilova kesh fayllari buzilgan",
+    "Telefon xotirasi to‘lib ketgan",
+    "Ilova eskirgan yoki yangilanmagan",
+    "Internet bilan bog‘liq muammo",
+    "Virusli APK o‘rnatilgan"
+  ],
+
+  actions:[
+    "Ilova keshini tozalang",
+    "Ilovani yangilang yoki qayta o‘rnating",
+    "Telefonni qayta yoqing",
+    "Xotiradan joy bo‘shating"
+  ],
+
+  advice:[
+    "Ilovalarni faqat Play Market yoki App Store’dan yuklang",
+    "Noma’lum APK fayllarni o‘rnatmang",
+    "Xotirani doim toza saqlang"
+  ],
+
+  warning:
+    "Agar ko‘p ilovalar bir vaqtning o‘zida ishlamay qolsa — tizim xatosi bo‘lishi mumkin, servis diagnostikasi tavsiya etiladi."
 },
 
 {
-keywords:["lag scroll","skroll sekin"],
-title:"📜 Skroll qilishda lag paydo bo‘lmoqda",
-text:`📜 Sabablari:
+  keywords:[
+    "face id ishlamayapti",
+    "touch id ishlamayapti",
+    "barmoq izi tanimayapti",
+    "yuzni tanimayapti",
+    "sensor tanimayapti"
+  ],
 
-• 60Hz ekran  
-• System animatsiya og‘irlashgan  
-• RAM etishmayapti  
+  title:"🔐 Face ID / Touch ID ishlamayapti",
 
-🛠 Yechim:
-• 120Hz rejimni yoqing (agar bo‘lsa)  
-• Animatsiya tezligini Developer Options’dan kamaytiring`
+  causes:[
+    "Sensor yoki kamera ifloslangan",
+    "Ekran original emas",
+    "Biometrik modul nosoz",
+    "Yuz yoki barmoq izi noto‘g‘ri skanerlangan",
+    "Dasturiy xatolik"
+  ],
+
+  actions:[
+    "Sensor va kamerani tozalang",
+    "Barmoq izini qayta qo‘shing",
+    "Telefonni qayta yoqing",
+    "Biometrik sozlamalarni tekshiring"
+  ],
+
+  advice:[
+    "Himoya plyonka sensorni yopib qo‘ymasligiga e’tibor bering",
+    "Arzon ekran almashtirishdan ehtiyot bo‘ling",
+    "Barmoqni nam yoki kir holatda skaner qilmang"
+  ],
+
+  warning:
+    "Agar Face ID yoki Touch ID umuman ishlamasa — biometrik modulni ustaxonada tekshirtirish kerak."
 },
 
 {
-keywords:["touch ghost","o‘zi bosadi","ghost touch"],
-title:"👻 Telefon o‘zi sensorni bosayotgandek bo‘lyapti (Ghost Touch)",
-text:`👻 Ghost touch — xavfli belgidir.
+  keywords:[
+    "qo'ng'iroqda ekran o'chmayapti",
+    "qulog'imga qo'ysam o'chmaydi",
+    "proximity ishlamayapti",
+    "ekran qulog'imga bosilyapti"
+  ],
 
-🛠 Sabablari:
-• Ekran matritsasi shikastlangan  
-• Namlik kirgan  
-• Arzon zaryadlovchi shovqin berayotgan  
+  title:"📞 Qo‘ng‘iroq paytida ekran o‘chmayapti",
 
-🔧 Yechim:
-• Ekran modulini tekshirtiring  
-• Faqat original quvvatlashdan foydalaning`
+  causes:[
+    "Proximity sensor ishlamayapti",
+    "Ekran himoya plyonkasi juda qalin",
+    "Sensor joyi ifloslangan",
+    "Ekran original emas"
+  ],
+
+  actions:[
+    "Ekran yuqori qismini tozalang",
+    "Himoya plyonkani olib sinab ko‘ring",
+    "Telefonni qayta yoqing"
+  ],
+
+  advice:[
+    "Sensor joyini yopib qo‘yadigan chex ishlatmang",
+    "Arzon ekran almashtirishdan ehtiyot bo‘ling"
+  ],
+
+  warning:
+    "Agar muammo doimiy bo‘lsa — proximity sensorni servisda tekshirtirish kerak."
 },
 
 {
-keywords:["vol button","tugma ishlamaydi"],
-title:"🔘 Ovozni oshirish/pasaytirish tugmalari ishlamayapti",
-text:`🔘 Sabablari:
+  keywords:[
+    "xotira to'lib ketgan",
+    "joy yo'q",
+    "storage full",
+    "xotira kam",
+    "telefon joy yo'q deyapti"
+  ],
 
-• Tugma ostiga chang kirgan  
-• Lenta-shleyf uzilgan  
-• Korpus sinishi  
+  title:"📁 Telefon xotirasi to‘lib ketgan",
 
-🛠 Yechim:
-• Tugma shleyfini almashtirish kerak  
-• Arzon ta’mir emas, qismini almashtirish tavsiya etiladi`
+  causes:[
+    "Galereyada juda ko‘p rasm va video",
+    "Telegram va ijtimoiy tarmoqlar keshi to‘plangan",
+    "Keraksiz ilovalar o‘rnatilgan",
+    "Yuklab olingan fayllar o‘chirilmagan"
+  ],
+
+  actions:[
+    "Keraksiz rasm va videolarni o‘chiring",
+    "Ilovalar keshini tozalang",
+    "Keraksiz ilovalarni o‘chiring",
+    "Telefonni qayta yoqing"
+  ],
+
+  advice:[
+    "Bulut xizmatlaridan foydalaning (Google Drive, iCloud)",
+    "Xotirani oyiga kamida 1 marta tozalang",
+    "Video va fayllarni SD karta yoki kompyuterga ko‘chiring"
+  ],
+
+  warning:
+    "Agar xotira doim tez to‘lib ketsa va telefon qotib qolsa — servisda umumiy diagnostika tavsiya etiladi."
 },
 
 {
-keywords:["haptic","vibration no"], 
-title:"🌀 Haptic Feedback ishlamayapti",
-text:`🌀 Haptic feedback — tebranishning maxsus nazorati.
+  keywords:[
+    "telefon o‘zi bosayapti",
+    "sensor o‘zi bosilyapti",
+    "ghost touch",
+    "ekran o‘zi ishlayapti",
+    "sensor g‘alati ishlayapti"
+  ],
 
-🔧 Sabablari:
-• Vibramotor ishlamayapti  
-• System haptic o‘chirilgan  
+  title:"👻 Telefon o‘zi bosayotgandek bo‘lyapti (Ghost Touch)",
 
-🛠 Yechim:
-• Sozlamalardan Haptic ni yoqing  
-• Agar javob bo‘lmasa — modul tiqilib qolgan bo‘lishi mumkin`
+  causes:[
+    "Ekran matritsasi shikastlangan",
+    "Sensor qatlamiga namlik kirgan",
+    "Arzon yoki sifatsiz ekran o‘rnatilgan",
+    "Noto‘g‘ri yoki sifatsiz zaryadlovchi shovqin berayapti",
+    "Telefon kuchli qizib ketgan"
+  ],
+
+  actions:[
+    "Telefonni zaryaddan uzib sinab ko‘ring",
+    "Telefonni sovuting",
+    "Ekran himoya plyonkasini olib tashlab ko‘ring",
+    "Telefonni qayta yoqing"
+  ],
+
+  advice:[
+    "Faqat original yoki sifatli zaryadlovchi ishlating",
+    "Telefonni suv va namlikdan ehtiyot qiling",
+    "Ekran almashtirishda sifatli modul tanlang"
+  ],
+
+  warning:
+    "Agar ekran o‘zi bosishda davom etsa — bu xavfli belgidir. Ekran modulini almashtirish uchun ustaxonaga murojaat qiling."
 },
 
 {
-keywords:["app icon yoqolgan","ilova belgisi yoq"],
-title:"❓ Ilova belgisi g‘oyib bo‘lib qolgan",
-text:`❓ Sabablari:
+  keywords:[
+    "oyinlarda lag",
+    "fps tushib ketayapti",
+    "oyin qotayapti",
+    "oyin sekin",
+    "fps past"
+  ],
 
-• Ilova yashirilgan  
-• Launcher buzilgan  
-• System glitch  
+  title:"🎮 O‘yinlarda FPS tushib ketmoqda",
 
-🛠 Yechim:
-• App listdan qayta qo‘shing  
-• Launcher keshini tozalang  
-• Reboot qiling`
+  causes:[
+    "Telefon qizib ketgan (thermal throttling)",
+    "Grafika sozlamalari juda yuqori",
+    "RAM yetishmayapti",
+    "Fon ilovalari ko‘p ishlayapti",
+    "Telefon modeli o‘yinga mos emas"
+  ],
+
+  actions:[
+    "O‘yin grafik sozlamalarini pasaytiring",
+    "Fon ilovalarni yopib chiqing",
+    "Telefonni sovitib o‘ynang",
+    "Telefonni qayta yoqing"
+  ],
+
+  advice:[
+    "Uzoq vaqt o‘yin o‘ynamasdan tanaffus qiling",
+    "O‘yin paytida telefonni quvvatlamang",
+    "Qalin chexolni o‘yin paytida yeching"
+  ],
+
+  warning:
+    "Agar FPS juda tushib ketsa va telefon qizib ishlasa — bu qurilma uchun zararli. Uzoq o‘ynamang yoki servisga murojaat qiling."
 },
 
 {
-keywords:["wifi calling","volte yoq","qo‘ng‘iroq chiqmaydi"],
-title:"📞 Qo‘ng‘iroq paytida ovoz yo‘q / ulmaydi",
-text:`📞 Sabablari:
+  keywords:[
+    "ilova yuklanmayapti",
+    "play market ishlamayapti",
+    "app store yuklamayapti",
+    "download bo‘lmayapti",
+    "ilova tushmayapti"
+  ],
 
-• VoLTE o‘chiq  
-• Operator sozlamalari noto‘g‘ri  
-• Mikrofon/antenna muammosi  
+  title:"🔄 Ilovalar yuklanmayapti (Play Market / App Store)",
 
-🛠 Yechim:
-• VoLTE ni yoqing  
-• APN sozlamasini tiklang`
+  causes:[
+    "Internet sekin yoki beqaror",
+    "Telefon xotirasi yetarli emas",
+    "Market ilovasi keshida xatolik",
+    "Hisob (Google ID / Apple ID) bilan muammo",
+    "Sana va vaqt noto‘g‘ri sozlangan"
+  ],
+
+  actions:[
+    "Internetni tekshirib ko‘ring",
+    "Xotiradan joy bo‘shating",
+    "Market keshini tozalang",
+    "Telefonni qayta yoqing"
+  ],
+
+  advice:[
+    "Wi-Fi orqali yuklash barqarorroq",
+    "Marketni o‘chirmang yoki bloklamang",
+    "Telefon vaqtini avtomatik qilib qo‘ying"
+  ],
+
+  warning:
+    "Agar hech qaysi ilova yuklanmasa — tizim xatosi bo‘lishi mumkin, servis diagnostikasi tavsiya etiladi."
 },
 
 {
-keywords:["tungi kamerada yomon","night mode"],
-title:"🌙 Tungi rasm juda yomon chiqmoqda",
-text:`🌙 Sabablari:
+  keywords:[
+    "ovoz tugmasi ishlamayapti",
+    "volume tugma ishlamayapti",
+    "tugma bosilmayapti",
+    "ovozni oshira olmayapman"
+  ],
 
-• Sensor kichik  
-• Stabilizator ishlamayapti  
-• Obyektiv iflos  
+  title:"🔘 Ovozni oshirish/pasaytirish tugmalari ishlamayapti",
 
-🛠 Yechim:
-• Stabilizatsiyani yoqing  
-• Obyektivni mikrofiber bilan tozalang`
+  causes:[
+    "Tugma ostiga chang yoki kir kirgan",
+    "Tugma shleyfi uzilgan",
+    "Telefon tushib ketgan",
+    "Suv yoki namlik kirgan"
+  ],
+
+  actions:[
+    "Telefonni qayta yoqing",
+    "Sozlamalardan ovozni sozlab ko‘ring",
+    "Tugmani kuch bilan bosmang"
+  ],
+
+  advice:[
+    "Telefonni suvdan ehtiyot qiling",
+    "Tugmalar joyini muntazam tozalab turing",
+    "Himoya chex ishlating"
+  ],
+
+  warning:
+    "Agar tugma umuman javob bermasa — shleyfni almashtirish uchun ustaxonaga murojaat qiling."
 },
 
 {
-keywords:["screen rotation","rotatsiya yoq","orientatsiya"],
-title:"🔄 Ekran aylanishi ishlamayapti",
-text:`🔄 Sabablari:
+  keywords:[
+    "sekin zaryad olayapti",
+    "tez zaryad ishlamayapti",
+    "zaryad sekin to‘lyapti",
+    "charging sekin"
+  ],
 
-• Auto-rotate o‘chirilgan  
-• Gyroscope ishlamayapti  
+  title:"🔴 Telefon juda sekin zaryad olayapti",
 
-🛠 Yechim:
-• Quick Panel → Auto Rotate yoqing  
-• Sensor testidan o‘tkazing`
+  causes:[
+    "Kabel yoki adapter sifatsiz",
+    "Zaryad portida chang bor",
+    "Fast charge funksiyasi o‘chirilgan",
+    "Telefon qizib ketgan",
+    "Batareya eskirgan"
+  ],
+
+  actions:[
+    "Original kabel va adapter bilan sinab ko‘ring",
+    "Zaryad portini havo bilan tozalang",
+    "Telefonni sovitib zaryadlang",
+    "Fast charge sozlamasini tekshiring"
+  ],
+
+  advice:[
+    "Telefonni o‘yin o‘ynab turib quvvatlamang",
+    "Arzon kabel va adapterlardan foydalanmang",
+    "Telefonni qalin chex bilan quvvatlamang"
+  ],
+
+  warning:
+    "Agar telefon juda sekin zaryad olib, qizib ketsa — batareya yoki zaryadlash chipini servisda tekshirtirish kerak."
 },
 
 {
-keywords:["touch id xizmat yo'q","parmak izi tanimaydi"],
-title:"🧬 Fingerprint juda sekin tanimoqda",
-text:`🧬 Sabablari:
+  keywords:[
+    "kompas ishlamayapti",
+    "kompas noto‘g‘ri",
+    "yo‘nalishni xato ko‘rsatyapti",
+    "gps kompas xato"
+  ],
 
-• Barmoq nam yoki iflos  
-• Sensor ostida chang  
-• Arzon ekran almashtirilgan  
+  title:"🧭 Kompas noto‘g‘ri yo‘nalish ko‘rsatyapti",
 
-🛠 Yechim:
-• Barmoqni qayta skaner qiling  
-• Himoya plyonkasini almashtiring`
+  causes:[
+    "Magnit sensor (magnetometr) kalibrovkadan chiqqan",
+    "Telefon kuchli magnit yaqinida bo‘lgan",
+    "Sensor dasturiy xato bilan ishlayapti",
+    "Telefon tushib ketib sensor siljigan"
+  ],
+
+  actions:[
+    "Telefonni havoda ∞ (sakkizlik) shaklida aylantirib ko‘ring",
+    "GPS va joylashuvni yoqib-o‘chiring",
+    "Telefonni qayta yoqing"
+  ],
+
+  advice:[
+    "Telefonni magnitli chex bilan ishlatmang",
+    "Karnay yoki magnit yonida saqlamang"
+  ],
+
+  warning:
+    "Agar kompas doim noto‘g‘ri ko‘rsatsa — magnetometr sensorni ustaxonada tekshirtirish kerak."
 },
 
 {
-keywords:["screen jitter","titroq","flicker"],
-title:"⚡ Ekran titrayapti (Flickering)",
-text:`⚡ Sabablari:
+  keywords:[
+    "bluetooth ulanmayapti",
+    "bluetooth uzilib qolayapti",
+    "naushnik ulanmayapti",
+    "bluetooth ishlamaydi"
+  ],
 
-• AMOLED PWM muammosi  
-• Video driver kuchsiz  
-• Ekran shikastlangan  
+  title:"📡 Bluetooth ulanmayapti yoki uzilib qolmoqda",
 
-🛠 Yechim:
-• Dark Mode yoqing  
-• Ekran yorqinligini o‘zgartiring  
-• Kuchaymasa — modulni almashtirish kerak`
+  causes:[
+    "Qurilma oldin boshqa telefon bilan bog‘langan",
+    "Bluetooth keshida xato",
+    "Versiya mos kelmasligi",
+    "Bluetooth antennasi zaiflashgan"
+  ],
+
+  actions:[
+    "Bluetoothni o‘chirib 10 soniya kutib qayta yoqing",
+    "‘Forget device’ qilib qayta ulang",
+    "Telefonni qayta yoqing"
+  ],
+
+  advice:[
+    "Bir vaqtning o‘zida ko‘p Bluetooth qurilma ulamang",
+    "Suv ta’siridan ehtiyot bo‘ling"
+  ],
+
+  warning:
+    "Agar hech bir qurilma ulanmasa — Bluetooth modulini servisda tekshirtirish kerak."
 },
 
 {
-keywords:["random vibro","notification yo‘q lekin titrayapti"],
-title:"🔔 Xabar yo‘q, lekin telefon tebranmoqda",
-text:`🔔 Buning 3 sababi bor:
+  keywords:[
+    "ekran aylanmayapti",
+    "auto rotate ishlamayapti",
+    "orientatsiya ishlamaydi"
+  ],
 
-• Background app vibratsiya buyruq yuboryapti  
-• Ghost Touch  
-• Virusli reklama  
+  title:"🔄 Ekran aylanishi ishlamayapti",
 
-🛠 Yechim:
-• Aktiv ilovalar ro‘yxatini tekshiring  
-• Antivirus bilan skaner qiling"`
+  causes:[
+    "Auto-rotate o‘chirilgan",
+    "Gyroscope sensori ishlamayapti",
+    "Dasturiy xatolik"
+  ],
+
+  actions:[
+    "Auto-rotate yoqilganini tekshiring",
+    "Telefonni qayta yoqing",
+    "Sensor test ilovasi bilan tekshiring"
+  ],
+
+  advice:[
+    "Sensorni bloklaydigan ilovalarni o‘rnatmang",
+    "Telefonni tushirib yubormaslikka harakat qiling"
+  ],
+
+ warning:
+    "Agar aylanish umuman ishlamasa — gyroscope sensorini servisda tekshirtirish kerak."
 },
 
 {
-keywords:["airplane mode","tarmoq yo‘q","signal"],
-title:"✈️ Airplane mode o‘chmayapti",
-text:`✈️ Sabablari:
+  keywords:[
+    "budilnik chalmadi",
+    "signal ishlamadi",
+    "alarm chalmayapti"
+  ],
 
-• Tizimdagi xatolik  
-• SIM modul ishlamayapti  
+  title:"⏰ Budilnik chalmasdan qolmoqda",
 
-🛠 Yechim:
-• Restart qiling  
-• SIM trayni tekshiring  
-• System update qiling`
+  causes:[
+    "Ovoz o‘chirilgan yoki past",
+    "Telefon o‘chib qolgan",
+    "Energiya tejash rejimi ilovani o‘chirgan",
+    "Budilnik ilovasi bloklangan"
+  ],
+
+  actions:[
+    "Budilnik ovozini maksimalga qo‘ying",
+    "Power Saving rejimini o‘chiring",
+    "Budilnik ruxsatlarini tekshiring"
+  ],
+
+  advice:[
+    "Muhim signal uchun standart budilnikdan foydalaning",
+    "Telefonni kechasi o‘chirmang"
+  ],
+
+  warning:
+    "Agar signal doim ishlamasa — tizim sozlamalarini servisda tekshirtirish tavsiya etiladi."
 },
 
 {
-keywords:["qora ekran","ekran past yorqinlik"],
-title:"🕶️ Ekran juda qorong‘i bo‘lib qolgan",
-text:`🕶️ Sabablari:
+  keywords:[
+    "ekran qorong‘i",
+    "yorqinlik past",
+    "ekran ko‘rinmayapti"
+  ],
 
-• Adaptive brightness buzilgan  
-• Sensor ifloslangan  
+  title:"🕶️ Ekran juda qorong‘i bo‘lib qolgan",
 
-🛠 Yechim:
-• Avto-yorqinlikni o‘chiring  
-• Sensorni tozalang  
-• Ekran modulini tekshirtiring`
+  causes:[
+    "Adaptive brightness xato ishlayapti",
+    "Yorug‘lik sensori yopilgan",
+    "Ekran matritsasi zaiflashgan"
+  ],
+
+  actions:[
+    "Avto-yorqinlikni o‘chiring",
+    "Yorqinlikni qo‘lda oshiring",
+    "Telefonni qayta yoqing"
+  ],
+
+  advice:[
+    "Sensor joyini yopib qo‘ymaydigan chex ishlating",
+    "Ekranni quyosh ostida uzoq qoldirmang"
+  ],
+
+  warning:
+    "Agar yorqinlik oshmasa — ekran modulini tekshirtirish kerak."
 },
 
 {
-keywords:["touch delay","sensor kechikish"],
-title:"⌛ Sensor bosish kechikmoqda",
-text:`⌛ Sabablari:
+  keywords:[
+    "bildirishnoma kelmayapti",
+    "notification yo‘q",
+    "xabar chiqmayapti"
+  ],
 
-• FPS past  
-• Ekran matritsasi eskirgan  
-• Animatsiya og‘ir  
+  title:"📩 Bildirishnomalar kelmayapti",
 
-🛠 Yechim:
-• 120Hz rejimni yoqing (bo‘lsa)  
-• System animatsiyalarini 0.5x ga tushiring`
+  causes:[
+    "Ilova bildirishnomalari o‘chirilgan",
+    "Battery saver ilovani to‘xtatgan",
+    "Internet fon rejimda uzilgan"
+  ],
+
+  actions:[
+    "Ilova notification sozlamalarini yoqing",
+    "Battery optimizationni o‘chiring",
+    "Telefonni qayta yoqing"
+  ],
+
+  advice:[
+    "Muhim ilovalarga fon ishlash ruxsatini bering",
+    "Doimiy internetni tekshirib turing"
+  ],
+
+  warning:
+    "Agar barcha ilovalarda bildirishnoma kelmasa — tizim xatosi bo‘lishi mumkin."
 },
 
 {
-keywords:["gallery crash","galereya yopilvotti"],
-title:"🔄 Galereya o‘z-o‘zidan yopilyapti",
-text:`🔄 Sabablari:
+  keywords:[
+    "qizil chiroq yonib turibdi",
+    "yashil chiroq xato",
+    "charging error chiroq"
+  ],
 
-• Media fayllar buzilgan  
-• Kesh to‘lgan  
-• Ilova yangilanishi shart  
+  title:"🧾 Telefon indikator chirog‘i xato ko‘rsatmoqda",
 
-🛠 Yechim:
-• Keshni tozalang  
-• Galereyani yangilang`
+  causes:[
+    "Batareya chuqur zaryadsiz holatda",
+    "Zaryadlash zanjiri nosoz",
+    "Sensor noto‘g‘ri signal berayapti"
+  ],
+
+  actions:[
+    "Original adapter bilan 20 daqiqa quvvatlab ko‘ring",
+    "Telefonni qayta yoqing"
+  ],
+
+  advice:[
+    "Arzon adapterlardan foydalanmang",
+    "Telefonni to‘liq o‘chirib zaryadlashdan ehtiyot bo‘ling"
+  ],
+
+ warning:
+    "Agar chiroq doim yonib tursa — batareya yoki chipni servisda tekshirtirish kerak."
 },
 
 {
-keywords:["dual app","klon ilova muammo"],
-title:"🟦 Klonlangan ilovalar ishlamayapti",
-text:`🟦 Sabablari:
+  keywords:[
+    "otg ishlamayapti",
+    "fleshka o‘qimayapti",
+    "usb ulamaydi"
+  ],
 
-• System dual app xatosi  
-• Xotira yetmayapti  
+  title:"🔌 USB OTG ishlamayapti",
 
-🛠 Yechim:
-• Klonlangan ilovani o‘chirib qayta yarating  
-• Telefonni qayta yoqing`
+  causes:[
+    "OTG funksiyasi o‘chirilgan",
+    "OTG kabel sifatsiz",
+    "USB port nosoz"
+  ],
+
+ actions:[
+    "OTG sozlamasini tekshiring",
+    "Boshqa OTG kabel bilan sinab ko‘ring",
+    "Telefonni qayta yoqing"
+  ],
+
+  advice:[
+    "Sifatli OTG kabel ishlating",
+    "USB portni ehtiyot qiling"
+  ],
+
+  warning:
+    "Agar OTG umuman ishlamasa — USB portni servisda tekshirtirish kerak."
 },
 
 {
-keywords:["carplay","android auto","ulanish muammo"],
-title:"🚗 CarPlay / Android Auto ulanmayapti",
-text:`🚗 Sabablari:
+  keywords:[
+    "vibratsiya ishlamayapti",
+    "telefon titramayapti",
+    "vibro yo‘q"
+  ],
 
-• USB kabel mos emas  
-• Port shikastlangan  
-• Ilovalar yangilanmagan  
+  title:"📳 Vibratsiya ishlamayapti",
 
-🛠 Yechim:
-• Sertifikatlangan USB kabel ishlating  
-• Mashina sistemini qayta ishga tushiring`
+  causes:[
+    "Vibratsiya sozlamalarda o‘chirilgan",
+    "Vibramotor nosoz",
+    "Suv ta’siri"
+  ],
+
+  actions:[
+    "Sozlamalardan vibratsiyani yoqing",
+    "Telefonni qayta yoqing"
+  ],
+
+  advice:[
+    "Telefonni suvdan ehtiyot qiling",
+    "Kuchli zarbadan saqlaning"
+  ],
+
+  warning:
+    "Agar vibratsiya umuman yo‘q bo‘lsa — vibramotorni servisda almashtirish kerak."
 },
 
 {
-keywords:["compass","kompas ishlamaydi"],
-title:"🧭 Kompas noto‘g‘ri ko‘rsatayapti",
-text:`🧭 Sabablari:
+  keywords:[
+    "system ui error",
+    "telefon xato beryapti",
+    "doim error chiqyapti"
+  ],
 
-• Magnet sensor buzilgan  
-• Kalibrovka kerak  
+  title:"🧩 Telefon doim xato bermoqda (System UI Error)",
 
-🛠 Yechim:
-• “∞” shaklida telefonni aylantirib kalibrovka qiling`
+  causes:[
+    "Tizim fayllari buzilgan",
+    "Yangilanish noto‘g‘ri o‘rnatilgan",
+    "Virusli ilova"
+  ],
+
+  actions:[
+    "Telefonni qayta yoqing",
+    "Oxirgi o‘rnatilgan ilovani o‘chiring",
+    "Yangilanishni tekshiring"
+  ],
+
+  advice:[
+    "Ilovalarni faqat rasmiy manbadan yuklang",
+    "Xotirani toza saqlang"
+  ],
+
+  warning:
+    "Agar xatolik yo‘qolmasa — ma’lumotlarni saqlab, servisda reset qilish tavsiya etiladi."
 },
 
 {
-keywords:["charge reverse","zaryad kamaymoqda zaryad olayotganda"],
-title:"🚨 Zaryad olayotganda ham quvvat kamaymoqda!",
-text:`🚨 Bu juda xavfli holat.
+  keywords:[
+    "telefon o‘zi o‘chib qolyapti",
+    "foiz bor lekin o‘chdi",
+    "birdan o‘chib qoldi"
+  ],
 
-🔧 Sabablari:
-• Adapter kuchsiz  
-• Charging IC nosoz  
-• Port oksidlangan  
+  title:"📱 Telefon o‘zi-o‘zidan o‘chib qolmoqda",
 
-🛠 Yechim:
-• Yangi original adapter sinab ko‘ring  
-• Kuchaymasa — servisga murojaat shart`
+  causes:[
+    "Batareya eskirgan yoki kuchlanish berolmayapti",
+    "Batareya kontaktlari bo‘shashgan",
+    "Telefon qizib himoya rejimiga o‘tgan",
+    "System xatosi"
+  ],
+
+  actions:[
+    "Telefonni sovuting va qayta yoqing",
+    "Quvvatni 20% dan pastga tushirmaslikka harakat qiling",
+    "Yangilanishlarni tekshiring"
+  ],
+
+  advice:[
+    "Telefonni qizib ketadigan joyda ishlatmang",
+    "Arzon batareya ishlatmang"
+  ],
+
+  warning:
+    "Agar muammo tez-tez takrorlansa — batareyani servisda tekshirtirish kerak."
 },
+
+{
+  keywords:[
+    "quloqchin ishlamayapti",
+    "naushnik ulangan lekin ovoz chiqmaydi",
+    "ovoz dinamikdan chiqyapti"
+  ],
+
+  title:"🔊 Quloqchin ulangan, lekin ovoz noto‘g‘ri chiqmoqda",
+
+  causes:[
+    "Audio port ichida chang bor",
+    "Quloqchin aniqlash sensori ishlamayapti",
+    "Audio sozlama xato"
+  ],
+
+  actions:[
+    "Audio portni havo bilan tozalang",
+    "Telefonni qayta yoqing",
+    "Boshqa quloqchin bilan sinab ko‘ring"
+  ],
+
+  advice:[
+    "Quloqchin portiga suv tushishidan ehtiyot bo‘ling",
+    "Sifatli quloqchin ishlating"
+  ],
+
+  warning:
+    "Agar quloqchin umuman tanilmasa — audio portni servisda tekshirtirish kerak."
+},
+
+{
+  keywords:[
+    "kamera rasm saqlamayapti",
+    "rasm yo‘qolib qolyapti",
+    "foto saqlanmaydi"
+  ],
+
+  title:"📷 Kamera rasmni saqlamayapti",
+
+  causes:[
+    "Xotira to‘lib ketgan",
+    "Saqlash ruxsati o‘chirilgan",
+    "SD karta nosoz"
+  ],
+
+  actions:[
+    "Xotiradan joy bo‘shating",
+    "Kamera ruxsatlarini tekshiring",
+    "Saqlash joyini telefon xotirasiga o‘zgartiring"
+  ],
+
+  advice:[
+    "Doim kamida 2–3GB bo‘sh joy qoldiring",
+    "Arzon SD kartadan foydalanmang"
+  ],
+
+  warning:
+    "Agar rasm umuman saqlanmasa — xotira chipi muammosi bo‘lishi mumkin."
+},
+
+{
+  keywords:[
+    "internet bor lekin ishlamayapti",
+    "ilovalar ochilmayapti internet bor",
+    "wifi bor lekin ishlamaydi"
+  ],
+
+  title:"🌐 Internet bor, lekin ilovalar ishlamayapti",
+
+  causes:[
+    "DNS xato sozlangan",
+    "VPN yoki proxy yoqilgan",
+    "Tarmoq keshida xato"
+  ],
+
+  actions:[
+    "VPN/proxy o‘chiring",
+    "Wi-Fi yoki mobil internetni qayta ulang",
+    "Telefonni qayta yoqing"
+  ],
+
+  advice:[
+    "Noma’lum VPN ilovalarni o‘rnatmang",
+    "Tarmoq sozlamalarini o‘zgartirmang"
+  ],
+
+  warning:
+    "Agar muammo saqlansa — tarmoq sozlamalarini reset qilish kerak."
+},
+
+{
+  keywords:[
+    "telefon sekin yoqiladi",
+    "uzoq ochilyapti",
+    "boot sekin"
+  ],
+
+  title:"🧠 Telefon juda sekin yoqilmoqda",
+
+  causes:[
+    "Xotira to‘lib ketgan",
+    "Orqa fonda ko‘p servis ishlayapti",
+    "System fayllari og‘irlashgan"
+  ],
+
+  actions:[
+    "Keraksiz ilovalarni o‘chiring",
+    "Telefonni 1–2 marta restart qiling",
+    "Yangilanishlarni tekshiring"
+  ],
+
+  advice:[
+    "Har oy telefonni tozalab turing",
+    "Keraksiz launcher ishlatmang"
+  ],
+
+  warning:
+    "Agar ochilish 3–5 daqiqagacha cho‘zilsa — servis diagnostikasi kerak."
+},
+
+{
+  keywords:[
+    "telefon qo‘lni kuydiryapti",
+    "juda qattiq qiziyapti",
+    "issiqligi xavfli"
+  ],
+
+  title:"🧯 Telefon haddan tashqari qizib ketmoqda",
+
+  causes:[
+    "CPU yoki GPU haddan tashqari yuklangan",
+    "Batareya ichki nosozlik",
+    "Arzon zaryadlovchi ishlatilgan"
+  ],
+
+  actions:[
+    "Darhol foydalanishni to‘xtating",
+    "Telefonni o‘chiring va sovuting",
+    "Zaryadlovchini uzing"
+  ],
+
+  advice:[
+    "Faqat original adapter ishlating",
+    "Telefonni o‘yin payti quvvatlamang"
+  ],
+
+  warning:
+    "Bu holat XAVFLI — darhol servisga murojaat qiling."
+},
+
+{
+  keywords:[
+    "ilova o‘zi yopilyapti",
+    "app crash bo‘lyapti",
+    "dastur ishlamayapti"
+  ],
+
+  title:"🗂️ Ilovalar o‘z-o‘zidan yopilib ketmoqda",
+
+  causes:[
+    "RAM yetishmayapti",
+    "Ilova tizimga mos emas",
+    "Yangilanish xato o‘rnatilgan"
+  ],
+
+  actions:[
+    "Fon ilovalarni yoping",
+    "Ilovani yangilang yoki qayta o‘rnating",
+    "Telefonni restart qiling"
+  ],
+
+  advice:[
+    "Eski telefonlarda og‘ir ilovalarni ishlatmang",
+    "RAMni doim bo‘sh saqlang"
+  ],
+
+  warning:
+    "Agar barcha ilovalar yopilsa — tizim xatosi bo‘lishi mumkin."
+},
+
+{
+  keywords:[
+    "telefon o‘zi bloklanayapti",
+    "ekran o‘zi qulflanadi",
+    "lock o‘zi bo‘lyapti"
+  ],
+
+  title:"🔐 Telefon o‘z-o‘zidan qulflanmoqda",
+
+  causes:[
+    "Power tugma yopishib qolgan",
+    "Ghost touch",
+    "Sensor nosozligi"
+  ],
+
+  actions:[
+    "Chexni olib sinab ko‘ring",
+    "Telefonni qayta yoqing",
+    "Ekranni tozalang"
+  ],
+
+  advice:[
+    "Telefonni nam joyda ishlatmang",
+    "Arzon chex ishlatmang"
+  ],
+
+  warning:
+    "Agar muammo davom etsa — power tugma yoki ekran tekshiriladi."
+},
+
+{
+  keywords:[
+    "internet uzilib qolayapti",
+    "mobil tarmoq yo‘qoladi",
+    "signal ketib qoladi"
+  ],
+
+  title:"📶 Mobil internet uzilib qolmoqda",
+
+  causes:[
+    "Tarmoq qamrovi zaif",
+    "SIM karta eskirgan",
+    "Antenna shleyfi bo‘shagan"
+  ],
+
+  actions:[
+    "Airplane mode yoqib o‘chiring",
+    "SIMni chiqarib qayta joylang",
+    "Tarmoq rejimini 4G/3G qilib ko‘ring"
+  ],
+
+  advice:[
+    "Eski SIM kartani yangilang",
+    "Telefonni urib tushirmang"
+  ],
+
+  warning:
+    "Agar signal umuman yo‘qolsa — antenna servisda tekshiriladi."
+},
+
+{
+  keywords:[
+    "telefon hid chiqaryapti",
+    "kuygan hid kelayapti",
+    "telefon hidlab ketdi"
+  ],
+
+  title:"🧼 Telefon ichidan g‘alati hid kelmoqda",
+
+  causes:[
+    "Batareya shishib qiziyapti",
+    "Chip kuyish boshlangan",
+    "Suvdan keyin oksidlanish"
+  ],
+
+  actions:[
+    "Darhol o‘chiring",
+    "Zaryadlovchini uzing",
+    "Telefonni ishlatmang"
+  ],
+
+  advice:[
+    "Bunday holatda o‘zingiz ochmang",
+    "Telefonni xavfsiz joyda saqlang"
+  ],
+
+  warning:
+    "BU XAVFLI — zudlik bilan servisga olib boring."
+},
+
+{
+  keywords:[
+    "face id ishlamayapti",
+    "ayfon face id yo‘q",
+    "yuz tanimayapti",
+    "true depth ishlamayapti"
+  ],
+
+  title:"🍎 Face ID ishlamayapti",
+
+  causes:[
+    "TrueDepth kamera moduliga zarba tekkan",
+    "Ekran original emas yoki noto‘g‘ri o‘rnatilgan",
+    "Suv yoki namlik Face ID moduliga kirgan",
+    "iOS yangilanishidan keyin tizim xatosi"
+  ],
+
+  actions:[
+    "Face ID sozlamalarini o‘chiring va qayta yoqing",
+    "Telefonni qayta ishga tushiring",
+    "Old kamerani tozalang"
+  ],
+
+  advice:[
+    "Ayfonda faqat original ekran ishlating",
+    "Face ID joyini yopib yurmaydigan chex tanlang"
+  ],
+
+  warning:
+    "Agar Face ID butunlay yo‘qolgan bo‘lsa — bu modul uyga bog‘langan. Faqat servis kalibrovkasi yordam beradi."
+},
+
+{
+  keywords:[
+    "ayfon zaryad oshmayapti",
+    "foiz turib qolyapti",
+    "iphone charging lekin oshmaydi"
+  ],
+
+  title:"🍎 iPhone zaryad olayapti, lekin foiz oshmayapti",
+
+  causes:[
+    "Batareya sog‘ligi past (Battery Health)",
+    "Telefon haddan tashqari qizigan",
+    "Original bo‘lmagan kabel yoki adapter",
+    "iOS fon jarayonlari ishlayapti"
+  ],
+
+  actions:[
+    "Telefonni sovuting",
+    "Original kabel va adapter ishlating",
+    "Low Power Mode yoqing"
+  ],
+
+  advice:[
+    "Battery Health 80% dan past bo‘lsa almashtiring",
+    "iPhone’ni o‘yin paytida quvvatlamang"
+  ],
+
+  warning:
+    "Agar zaryad umuman oshmasa — batareya yoki charging IC tekshiriladi."
+},
+
+{
+  keywords:[
+    "ayfon sensor kechikayapti",
+    "ekran sekin javob beradi",
+    "touch ishlamayapti iphone"
+  ],
+
+  title:"🍎 iPhone sensor kechikib ishlayapti",
+
+  causes:[
+    "Original bo‘lmagan ekran",
+    "iOS xatosi",
+    "Telefon qizib ketgan",
+    "Namlik sensor qatlamiga ta’sir qilgan"
+  ],
+
+  actions:[
+    "Telefonni qayta yoqing",
+    "Ekranni tozalang",
+    "Himoya oynani olib sinab ko‘ring"
+  ],
+
+  advice:[
+    "Arzon ekranlardan foydalanmang",
+    "Telefonni suvdan ehtiyot qiling"
+  ],
+
+  warning:
+    "Agar sensor baribir kechiksa — ekran modulini servisda tekshirtirish kerak."
+},
+
+{
+  keywords:[
+    "ayfon mikrofon ishlamayapti",
+    "ovoz yozmaydi iphone",
+    "siri eshitmayapti"
+  ],
+
+  title:"🍎 iPhone mikrofon ishlamayapti",
+
+  causes:[
+    "Mikrofon teshigi changlangan",
+    "Suvdan keyin oksidlanish",
+    "Audio IC chip nosoz",
+    "iOS ruxsatlar o‘chiq"
+  ],
+
+  actions:[
+    "Mikrofon teshigini tozalang",
+    "Sozlamalardan mikrofon ruxsatini tekshiring",
+    "Ovoz yozib sinab ko‘ring"
+  ],
+
+  advice:[
+    "Suvdan keyin iPhone’ni yoqmang",
+    "Arzon chex mikrofonni yopib qo‘ymasligiga e’tibor bering"
+  ],
+
+  warning:
+    "Agar Siri va qo‘ng‘iroqda ovoz yo‘q bo‘lsa — Audio IC servisda ta’mirlanadi."
+},
+
+{
+  keywords:[
+    "ayfon kamera fokus qilmayapti",
+    "kamera xira iphone",
+    "iphone fokus tushmayapti"
+  ],
+
+  title:"🍎 iPhone kamera fokus ishlamayapti",
+
+  causes:[
+    "Kamera stabilizatori (OIS) buzilgan",
+    "Telefon tushib ketgan",
+    "Kamera moduli shikastlangan"
+  ],
+
+  actions:[
+    "Telefonni qayta yoqing",
+    "Kamera oynasini tozalang",
+    "Boshqa kamera rejimini sinab ko‘ring"
+  ],
+
+  advice:[
+    "Telefonni qattiq silkitmang",
+    "Kamera oynasini himoyalang"
+  ],
+
+  warning:
+    "Agar fokus umuman ishlamasa — kamera modulini almashtirish kerak."
+},
+
+{
+  keywords:[
+    "ayfon qiziyapti",
+    "iphone issiq bo‘lyapti",
+    "iphone qizib ketdi"
+  ],
+
+  title:"🍎 iPhone oddiy ishlatishda qizib ketmoqda",
+
+  causes:[
+    "iOS fon jarayonlari",
+    "Batareya eskirgan",
+    "Original bo‘lmagan zaryadlovchi",
+    "Signal qidirish kuchli"
+  ],
+
+  actions:[
+    "Telefonni qayta yoqing",
+    "Low Power Mode yoqing",
+    "Telefonni sovuting"
+  ],
+
+  advice:[
+    "iOS’ni doim yangilab turing",
+    "Telefonni quyoshda qoldirmang"
+  ],
+
+  warning:
+    "Agar iPhone qo‘lni kuydirsa — darhol servisga murojaat qiling."
+},
+
+{
+  keywords:[
+    "iphone wifi bor lekin internet yo‘q",
+    "ayfon wifi ishlamayapti"
+  ],
+
+  title:"🍎 iPhone Wi-Fi bor, lekin internet ishlamayapti",
+
+  causes:[
+    "DNS xatosi",
+    "Router mos emas",
+    "iOS tarmoq sozlamasi buzilgan"
+  ],
+
+  actions:[
+    "Wi-Fi’ni o‘chiring va qayta ulang",
+    "Network Settings reset qiling",
+    "Boshqa Wi-Fi bilan sinab ko‘ring"
+  ],
+
+  advice:[
+    "VPN ishlatmaslikka harakat qiling",
+    "Noma’lum tarmoq sozlamalarini o‘zgartirmang"
+  ],
+
+  warning:
+    "Agar barcha tarmoqlarda ishlamasa — Wi-Fi chip tekshiriladi."
+},
+
+{
+  keywords:[
+    "iphone restart bo‘lyapti",
+    "ayfon o‘zi qayta yoqilyapti"
+  ],
+
+  title:"🍎 iPhone o‘z-o‘zidan restart bo‘lmoqda",
+
+  causes:[
+    "Batareya kuchlanish berolmayapti",
+    "iOS tizim xatosi",
+    "Plata ichida muammo"
+  ],
+
+  actions:[
+    "iOS’ni yangilang",
+    "Telefonni to‘liq zaryadlab ko‘ring",
+    "Keraksiz ilovalarni o‘chiring"
+  ],
+
+  advice:[
+    "Eski iPhone’larda batareya muhim rol o‘ynaydi",
+    "Arzon batareya ishlatmang"
+  ],
+
+  warning:
+    "Agar tez-tez restart bo‘lsa — servis diagnostikasi shart."
+},
+
+{
+  keywords:[
+    "iphone no service",
+    "ayfon sim ko‘rmayapti",
+    "signal yo‘q iphone"
+  ],
+
+  title:"🍎 iPhone SIM karta ko‘rmayapti",
+
+  causes:[
+    "SIM tray egilgan",
+    "Baseband chip nosoz",
+    "IMEI muammosi",
+    "iOS xatosi"
+  ],
+
+  actions:[
+    "SIMni qayta joylang",
+    "Airplane mode yoqib o‘chiring",
+    "Boshqa SIM bilan sinab ko‘ring"
+  ],
+
+  advice:[
+    "SIM trayni kuch bilan tiqmang",
+    "Telefonni tushirmaslikka harakat qiling"
+  ],
+
+  warning:
+    "Agar No Service doimiy bo‘lsa — Baseband servisda tekshiriladi."
+},
+
+{
+  keywords:[
+    "iphone storage full xato",
+    "xotira to‘ldi iphone",
+    "system storage juda ko‘p"
+  ],
+
+  title:"🍎 iPhone xotira xatolari (System Data ko‘payib ketgan)",
+
+  causes:[
+    "System Data haddan tashqari to‘plangan",
+    "Kesh avtomatik tozalanmagan",
+    "iOS xatosi"
+  ],
+
+  actions:[
+    "Telefonni qayta yoqing",
+    "Keraksiz ilovalarni o‘chiring",
+    "iCloud backup qilib, reset qiling"
+  ],
+
+  advice:[
+    "Vaqti-vaqti bilan restart qiling",
+    "Xotirani 90% dan oshirmang"
+  ],
+
+  warning:
+    "Agar System Data kamaymasa — to‘liq reset tavsiya etiladi."
+},
+
+{
+  keywords:[
+    "telefon sekin ishlayapti",
+    "telefon qotayapti",
+    "telefon lag bo‘lyapti",
+    "sekinlashib ketdi"
+  ],
+
+  title:"🌍 Telefon juda sekin ishlayapti",
+
+  causes:[
+    "Xotira 90% dan oshib ketgan",
+    "Fon rejimida juda ko‘p ilovalar ishlayapti",
+    "Operatsion tizim og‘irlashgan",
+    "Telefon apparat jihatdan eskirgan"
+  ],
+
+  actions:[
+    "Keraksiz ilovalarni o‘chiring",
+    "Fon ilovalarni yoping",
+    "Telefonni qayta yoqing",
+    "Kesh fayllarni tozalang"
+  ],
+
+  advice:[
+    "Xotirani doim bo‘sh saqlashga harakat qiling",
+    "Har oy telefonni restart qiling"
+  ],
+
+  warning:
+    "Agar telefon kundalik ishlatishda ham juda sekin bo‘lsa — servis diagnostikasi tavsiya etiladi."
+},
+
+{
+  keywords:[
+    "batareya tez tugayapti",
+    "zaryad ushlamayapti",
+    "telefon tez o‘chadi"
+  ],
+
+  title:"🌍 Batareya juda tez tugayapti",
+
+  causes:[
+    "Batareya eskirgan",
+    "Ekran yorqinligi juda baland",
+    "Internet, GPS va Bluetooth doim yoqilgan",
+    "Fon ilovalar energiyani yeyapti"
+  ],
+
+  actions:[
+    "Ekran yorqinligini pasaytiring",
+    "Keraksiz xizmatlarni o‘chiring",
+    "Power Saving rejimini yoqing"
+  ],
+
+  advice:[
+    "Batareyani 20–80% oralig‘ida zaryadlang",
+    "Telefonni qizib ketadigan joyda ishlatmang"
+  ],
+
+  warning:
+    "Agar zaryad juda tez tushsa — batareya almashtirilishi mumkin."
+},
+
+{
+  keywords:[
+    "telefon qiziyapti",
+    "telefon issiq",
+    "telefon qizib ketdi"
+  ],
+
+  title:"🌍 Telefon qizib ketayapti",
+
+  causes:[
+    "Uzoq vaqt o‘yin yoki video ishlatilgan",
+    "Fon jarayonlari ko‘p",
+    "Telefon zaryad olayotganda ishlatilgan",
+    "Batareya yoki chip eskirgan"
+  ],
+
+  actions:[
+    "Telefonni vaqtincha o‘chiring",
+    "Zaryaddan uzing",
+    "Qalin chexolni olib tashlang"
+  ],
+
+  advice:[
+    "Telefonni o‘yin paytida quvvatlamang",
+    "Quyoshda uzoq qoldirmang"
+  ],
+
+  warning:
+    "Agar telefon qo‘lni kuydirsa — bu xavfli, servisga murojaat qiling."
+},
+
+{
+  keywords:[
+    "zaryad olmayapti",
+    "sekin zaryad bo‘lyapti",
+    "charging ishlamayapti"
+  ],
+
+  title:"🌍 Telefon zaryad muammosi",
+
+  causes:[
+    "Zaryad portida chang",
+    "Kabel yoki adapter sifatsiz",
+    "Batareya eskirgan",
+    "Zaryadlash chipi nosoz"
+  ],
+
+  actions:[
+    "Portni havo bilan tozalang",
+    "Original kabel sinab ko‘ring",
+    "Telefonni sovitib quvvatlang"
+  ],
+
+  advice:[
+    "Arzon zaryadlovchi ishlatmang",
+    "Telefonni qattiq tortib zaryadlamang"
+  ],
+
+  warning:
+    "Agar umuman zaryad olmasa — servis tekshiruvi shart."
+},
+
+{
+  keywords:[
+    "internet ishlamayapti",
+    "wifi ishlamaydi",
+    "mobil internet uzilyapti"
+  ],
+
+  title:"🌍 Internet muammosi",
+
+  causes:[
+    "Tarmoq qamrovi zaif",
+    "Wi-Fi yoki mobil sozlama xato",
+    "DNS yoki tarmoq kesh muammosi"
+  ],
+
+  actions:[
+    "Airplane mode yoqib o‘chiring",
+    "Internetni qayta ulang",
+    "Telefonni qayta yoqing"
+  ],
+
+  advice:[
+    "VPN’ni faqat zarur bo‘lsa ishlating",
+    "Tarmoq sozlamalarini keraksiz o‘zgartirmang"
+  ],
+
+  warning:
+    "Agar barcha tarmoqlarda ishlamasa — antenna yoki chip tekshiriladi."
+},
+
+{
+  keywords:[
+    "ilova ochilmayapti",
+    "app yopilib ketayapti",
+    "dastur ishlamayapti"
+  ],
+
+  title:"🌍 Ilovalar ishlamayapti",
+
+  causes:[
+    "Xotira yetishmayapti",
+    "Ilova yangilanmagan",
+    "Tizim bilan mos kelmayapti"
+  ],
+
+  actions:[
+    "Ilovani yangilang",
+    "Xotiradan joy bo‘shating",
+    "Telefonni restart qiling"
+  ],
+
+  advice:[
+    "Ilovalarni faqat rasmiy manbadan yuklang",
+    "Og‘ir ilovalarni eski telefonlarda ishlatmang"
+  ],
+
+  warning:
+    "Agar barcha ilovalar yopilsa — tizim xatosi bo‘lishi mumkin."
+},
+
+{
+  keywords:[
+    "telefon o‘zi o‘chadi",
+    "foiz bor o‘chib qoldi",
+    "birdan o‘chdi"
+  ],
+
+  title:"🌍 Telefon o‘z-o‘zidan o‘chmoqda",
+
+  causes:[
+    "Batareya kuchlanish berolmayapti",
+    "Telefon qizib himoyaga o‘tgan",
+    "Tizim xatosi"
+  ],
+
+  actions:[
+    "Telefonni sovuting",
+    "Zaryadni 20% dan pastga tushirmang",
+    "Telefonni qayta yoqing"
+  ],
+
+  advice:[
+    "Eskirgan batareyani almashtiring",
+    "Telefonni urib tushirmang"
+  ],
+
+  warning:
+    "Agar tez-tez o‘chsa — servis tekshiruvi zarur."
+},
+
+{
+  keywords:[
+    "kamera xira",
+    "kamera yomon",
+    "fokus tushmayapti"
+  ],
+
+  title:"🌍 Kamera sifati yomonlashgan",
+
+  causes:[
+    "Kamera oynasi iflos",
+    "Kamera moduli shikastlangan",
+    "Dasturiy xato"
+  ],
+
+  actions:[
+    "Kamera oynasini tozalang",
+    "Telefonni qayta yoqing",
+    "Kamera sozlamalarini tekshiring"
+  ],
+
+  advice:[
+    "Telefonni tushirmaslikka harakat qiling",
+    "Kamera oynasini himoyalang"
+  ],
+
+ warning:
+    "Agar fokus umuman ishlamasa — modul almashtiriladi."
+},
+
+{
+  keywords:[
+    "ovoz past",
+    "dinamik ishlamayapti",
+    "ovoz chiqmaydi"
+  ],
+
+  title:"🌍 Ovoz muammosi",
+
+  causes:[
+    "Dinamik changlangan",
+    "Suv ta’siri",
+    "Audio chip nosoz"
+  ],
+
+  actions:[
+    "Dinamik panjarasini tozalang",
+    "Quloqchin bilan tekshirib ko‘ring",
+    "Telefonni qayta yoqing"
+  ],
+
+  advice:[
+    "Telefonni suvdan ehtiyot qiling",
+    "Changli muhitda ehtiyot bo‘ling"
+  ],
+
+  warning:
+    "Agar ovoz butunlay yo‘q bo‘lsa — servisga murojaat qiling."
+},
+
+{
+  keywords:[
+    "xotira to‘lib ketdi",
+    "joy yo‘q",
+    "storage full"
+  ],
+
+  title:"🌍 Telefon xotirasi tez to‘lib ketmoqda",
+
+  causes:[
+    "Rasm va videolar ko‘payib ketgan",
+    "Ilova kesh fayllari to‘plangan",
+    "System fayllar kattalashgan"
+  ],
+
+  actions:[
+    "Keraksiz fayllarni o‘chiring",
+    "Keshni tozalang",
+    "Bulutga yuklang"
+  ],
+
+  advice:[
+    "Har oy xotirani tekshirib turing",
+    "Media fayllarni tashqi xotiraga saqlang"
+  ],
+
+  warning:
+    "Agar xotira doim to‘lib tursa — tizimni tozalash yoki reset kerak bo‘lishi mumkin."
+}
 
 
 
@@ -1232,34 +2383,78 @@ text:`🚨 Bu juda xavfli holat.
    DIAGNOSTIC ENGINE
 =========================================== */
 function diagnose(){
-  let text=document.getElementById("problemInput").value.toLowerCase();
-  let box=document.getElementById("resultBox");
-  box.innerHTML="";
+  const text = document.getElementById("problemInput").value.toLowerCase();
+  const box = document.getElementById("resultBox");
+  box.innerHTML = "";
 
   if(!text.trim()){
-    box.innerHTML=`<div class='result-card'><div class='result-title'>⚠️ Xatolik</div><div class='result-text'>Muammoni yozmadingiz.</div></div>`;
+    box.innerHTML = `
+      <div class="result-card">
+        <div class="result-title">⚠️ Xatolik</div>
+        <div class="result-text">Muammo yozilmadi.</div>
+      </div>`;
     return;
   }
 
-  let found=false;
+  let found = false;
+
   DB.forEach(item=>{
     if(item.keywords.some(k=>text.includes(k))){
-      found=true;
-      box.innerHTML+=`<div class='result-card'><div class='result-title'>${item.title}</div><div class='result-text'>${item.text}</div></div>`;
+      found = true;
+      box.innerHTML += renderResult(item);
     }
   });
 
   if(!found){
-    box.innerHTML=`<div class='result-card'>
-      <div class='result-title'>🤖 Maxsus diagnostika</div>
-      <div class='result-text'>
-        Siz yozgan muammo bo‘yicha aniq kategoriya topilmadi.  
-        Lekin bu modul, sensor yoki dasturiy nosozlik bo‘lishi mumkin.  
-        Telefonni qayta yoqing va uzoq ishlatib ko‘ring. Agar muammo davom etsa — servisga murojaat qiling.
+    box.innerHTML = `
+    <div class="result-card">
+      <div class="result-title">🤖 Maxsus diagnostika</div>
+      <div class="result-text">
+        Muammo aniq aniqlanmadi. Bu dasturiy yoki apparat nosozlik bo‘lishi mumkin.
+      </div>
+      <div class="result-text">
+        📍 Agar muammo davom etsa — ustaxonaga murojaat qiling.
       </div>
     </div>`;
   }
 }
+
+
+function renderResult(item){
+  return `
+  <div class="result-card">
+    <div class="result-title">${item.title}</div>
+
+    <div class="result-section">
+      <div class="section-title">❓ Muammo sabablari</div>
+      <ul>
+        ${item.causes.map(c=>`<li>${c}</li>`).join("")}
+      </ul>
+    </div>
+
+    <div class="result-section">
+      <div class="section-title">🛠 Nima qilish kerak</div>
+      <ul>
+        ${item.actions.map(a=>`<li>${a}</li>`).join("")}
+      </ul>
+    </div>
+
+    <div class="result-section">
+      <div class="section-title">💡 Tavsiya</div>
+      <ul>
+        ${item.advice.map(t=>`<li>${t}</li>`).join("")}
+      </ul>
+    </div>
+
+    <div class="result-section">
+      <div class="section-title">📍 Qachon murojaat qilish kerak</div>
+      <div class="result-text">${item.warning}</div>
+    </div>
+  </div>
+  `;
+}
+
+
 
 /* ===========================================
    GUIDE CONTENT
