@@ -352,38 +352,36 @@ function switchTab(tab,e){
 
 function startSpeech(){
   if(!("webkitSpeechRecognition" in window)){
-    alert("Ovoz tanish qo‘llab-quvvatlanmaydi");
+    alert("Brauzeringiz ovoz tanishni qo‘llab-quvvatlamaydi");
     return;
   }
 
-  const indicator = document.getElementById("listening");
-  const micWave = document.getElementById("micWave");
+  navigator.mediaDevices.getUserMedia({ audio: true })
+    .then(() => {
+      const r = new webkitSpeechRecognition();
+      r.lang = "uz-UZ";
+      r.interimResults = false;
 
-  const r = new webkitSpeechRecognition();
-  r.lang = "uz-UZ";
-  r.interimResults = false;
+      r.onstart = () => {
+        showInfo("🎙 Gapiring, tinglayapman...");
+      };
 
-  // 🎤 gapirish boshlandi
-  r.onstart = () => {
-    indicator.style.display = "block";
-    micWave.style.display = "block";
-  };
+      r.onerror = (e) => {
+        showInfo("❌ Mikrofon ruxsati berilmadi");
+      };
 
-  // 🛑 gapirish tugadi
-  r.onend = () => {
-    indicator.style.display = "none";
-    micWave.style.display = "none";
-  };
+      r.onresult = (e) => {
+        document.getElementById("problemInput").value =
+          e.results[0][0].transcript;
+      };
 
-  // 📝 natija keldi
-  r.onresult = (e) => {
-    const text = e.results[0][0].transcript;
-    document.getElementById("problemInput").value = text;
-    diagnose(); // avtomatik qidiruv
-  };
-
-  r.start();
+      r.start();
+    })
+    .catch(() => {
+      showInfo("⚠️ Mikrofon ruxsati kerak");
+    });
 }
+
 
 /* ===========================================
    DIAGNOSTIC DATABASE
